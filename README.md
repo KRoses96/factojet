@@ -11,6 +11,7 @@ The app's goal is to easily organize work within a factory in a easy and automat
 ## MVP
 
 ![](readImgs/struc.png)
+---
 
 ### Stack
 
@@ -69,6 +70,8 @@ As previously mentioned the main goal of the app is the reorganization and findi
 This table holds the value of importance calculated by the total of hours needed for the current projects skillsets. Example:
 
 If it's currently needed a total 150hours of CNC and 40hours of forklift, if John has both skills his value will be 190, and if Bertha only has CNC skills then Bertha will have a value of 150.
+
+So when picking a person to do a certain task it will always pick the one with least importance.
 
 ---
 
