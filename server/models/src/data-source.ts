@@ -5,7 +5,7 @@ import { Skill } from "./entity/Skill";
 import { Person } from "./entity/Person";
 import { Project } from "./entity/Project";
 import { Task } from "./entity/Task";
-import { PeopleAvaliability } from "./entity/PeopleAvaliability";
+import { PersonAvaliability } from "./entity/PersonAvaliability";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -13,10 +13,10 @@ export const AppDataSource = new DataSource({
   port: 5432,
   username: "postgres",
   password: "",
-  database: "factorito",  
+  database: "factorito",
   synchronize: true,
   logging: false,
-  entities: [Person, Project, Skill, Task, User, PeopleAvaliability],
+  entities: [Person, Project, Skill, Task, User, PersonAvaliability],
   migrations: [],
   subscribers: [],
 });

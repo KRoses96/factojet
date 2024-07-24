@@ -3,6 +3,7 @@ import { allSkills, insertSkill } from "../controllers/SkillController";
 import {  allPeople, insertPerson, insertSkillToPerson, removePerson, removeSkillToPerson } from "../controllers/PersonController";
 import { allProjects, insertDetailProject, insertProject, removeProject } from "../controllers/ProjectController";
 import { insertTask, removeTask } from "../controllers/TaskController";
+import { insertAvaliability } from "../controllers/PersonAvaliabilityController";
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -18,6 +19,10 @@ router.post('/people', insertPerson)
 router.delete('/people',removePerson)
 router.get('/people', allPeople)
 
+//PersonAvaliability
+router.post('/avaliability', insertAvaliability)
+//router.get('/avaliability',)
+
 //Person-skill
 router.post('/skillToPerson', insertSkillToPerson)
 router.delete('/skillToPerson', removeSkillToPerson)
@@ -31,5 +36,7 @@ router.put('/projectDetail', insertDetailProject)
 //Task
 router.post('/task',insertTask)
 router.delete('/task',removeTask)
+
+
 
 export {router}
