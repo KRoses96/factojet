@@ -8,9 +8,6 @@ export class Task {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column({ nullable: false })
-    name: string
-
     @Column ({nullable: false})
     time: number
 
