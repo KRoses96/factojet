@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from "typeorm";
 import { Person } from "./Person";
 
 @Entity()
@@ -8,7 +14,7 @@ export class PeopleAvaliability {
 
   @OneToOne(() => Person)
   @JoinColumn()
-  person : Person
+  person: Person;
 
   @Column()
   monday_start: Date;

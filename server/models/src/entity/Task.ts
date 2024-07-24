@@ -1,20 +1,29 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne,ManyToMany, JoinTable } from "typeorm"
-import { Project } from "./Project"
-import { Skill } from "./Skill"
-
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+} from "typeorm";
+import { Project } from "./Project";
+import { Skill } from "./Skill";
 
 @Entity()
 export class Task {
-    @PrimaryGeneratedColumn()
-    id: number
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column ({nullable: false})
-    time: number
+  @Column({ nullable: false })
+  name: string;
 
-    @ManyToOne(() => Project, (project) => project.tasks)
-    project : Project
+  @Column({ nullable: false })
+  time: number;
 
-    @ManyToMany(() => Skill)
-    @JoinTable()
-    skills: Skill[]
+  @ManyToOne(() => Project, (project) => project.tasks)
+  project: Project;
+
+  @ManyToMany(() => Skill)
+  @JoinTable()
+  skills: Skill[];
 }

@@ -12,7 +12,7 @@ export class Project {
   @Column({ nullable: false })
   start_date: Date;
 
-  @Column()
+  @Column({ nullable: true })
   details: string;
 
   @OneToMany(() => Task, (task) => task.project)

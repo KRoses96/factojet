@@ -18,6 +18,9 @@ export class User {
   @Column({ nullable: false })
   pass: string;
 
+  @Column({ nullable: false })
+  admin: boolean;
+
   @OneToOne(() => Person)
   @JoinColumn()
   person_id: Person;
