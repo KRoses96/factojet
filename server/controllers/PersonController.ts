@@ -3,7 +3,7 @@ import {
   addPerson,
   getPeople,
   addSkillToPerson,
-  deleteSkillToPerson,
+  deleteSkillToPerson,  
   deletePerson,
 } from "../models/methods/PersonMethods";
 

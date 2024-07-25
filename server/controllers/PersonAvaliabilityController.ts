@@ -43,7 +43,7 @@ export const insertAvaliability = (req: Request, res: Response) => {
 };
 
 
-export const allAvaliability = async (req: Request , res: Response) => {
+export const allAvaliability = async(req: Request , res: Response) => {
   try {
     const avaliability = await getAvaliability();
     res.status(200).send(avaliability);

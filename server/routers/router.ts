@@ -6,6 +6,7 @@ import { allTasks, insertTask, removeTask } from "../controllers/TaskController"
 import { allAvaliability, insertAvaliability } from "../controllers/PersonAvaliabilityController";
 import { allTools, insertTool, removeTool } from "../controllers/ToolController";
 import { deleteSkill } from "../models/methods/SkillMethods";
+import { solutionFinder } from "../controllers/solutionController";
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -41,4 +42,9 @@ router.get('/task',allTasks)
 router.post('/tool',insertTool)
 router.delete('/tool',removeTool)
 router.get('/tool',allTools)
+
+
+//Plan
+router.get('/solution', solutionFinder)
+
 export {router}
