@@ -20,8 +20,15 @@ export class Task {
   @Column({ nullable: false })
   time: number;
 
+  @Column ()
+  complete: false;
+
   @ManyToOne(() => Project, (project) => project.tasks)
   project: Project;
+
+  @ManyToMany(() => Task, (task) => task.required)
+  @JoinTable()
+  required: Task[];
 
   @ManyToMany(() => Skill)
   @JoinTable()

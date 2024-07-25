@@ -1,4 +1,10 @@
 {
+  
+    "name": "build",
+    "version": "1.0.0",
+    "scripts": {
+      "start": "npx nodemon index.ts"
+    },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",

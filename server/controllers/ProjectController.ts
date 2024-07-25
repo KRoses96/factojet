@@ -8,8 +8,9 @@ import {
 export const insertProject = async (req: Request, res: Response) => {
   try {
     const projectName = req.body.projectName;
-    const projectStartDate = req.body.projectStart;
-    await addProject(projectName, projectStartDate);
+    const projectStart = req.body.projectStart;
+    const projectPriority = req.body.projectPriority
+    await addProject(projectName, projectStart, projectPriority);
     res.status(201).send(`${projectName} added!`);
   } catch (error) {
     res.status(400).send(error);

@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, Unique } from "typeorm";
 import { Task } from "./Task";
 
 @Entity()
+@Unique(['name'])
 export class Project {
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,6 +15,9 @@ export class Project {
 
   @Column({ nullable: true })
   details: string;
+
+  @Column()
+  priority: number
 
   @OneToMany(() => Task, (task) => task.project)
   tasks: Task[];

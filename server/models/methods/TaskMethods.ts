@@ -7,7 +7,8 @@ export const addTask = async (
   taskName: string,
   timeHours: number,
   project: string,
-  skills: string
+  skills: string,
+  required: string
 ) => {
   const projectId = await AppDataSource.manager
     .findOneBy(Project, {
@@ -34,7 +35,6 @@ export const addTask = async (
 
     const skillArr = skills.split(",");
     for (let skill of skillArr) {
-      console.log(skill);
       const skillId = await AppDataSource.manager
         .findOneBy(Skill, {
           name: skill,
@@ -46,7 +46,21 @@ export const addTask = async (
         .of(task)
         .add(skillId);
     }
+
+    if(required) {
+    const requiredArr = required.split(",");
+    for (let taskToComplete of requiredArr) {
+      const taskToCompleteId = await AppDataSource.manager.findOneBy(Task, {
+        name: taskToComplete
+      }).then((taskFound) => taskFound? taskFound.id : null)
+
+      await AppDataSource.createQueryBuilder()
+      .relation(Task, "tasks")
+      .of(task)
+      .add(taskToCompleteId)
+    }
   }
+}
 };
 
 export const deleteTask = async (name: string) => {
@@ -55,4 +69,9 @@ export const deleteTask = async (name: string) => {
     .from(Task)
     .where("name = :name", { name: name })
     .execute();
+};
+
+
+export const getTasks = async () => {
+  return AppDataSource.manager.find(Task);
 };

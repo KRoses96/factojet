@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { addAvaliability } from "../models/methods/PersonAvaliabilityMethods";
+import { addAvaliability, getAvaliability } from "../models/methods/PersonAvaliabilityMethods";
 
 export const insertAvaliability = (req: Request, res: Response) => {
   try {
@@ -41,3 +41,13 @@ export const insertAvaliability = (req: Request, res: Response) => {
     res.status(400).send(error);
   }
 };
+
+
+export const allAvaliability = async (req: Request , res: Response) => {
+  try {
+    const avaliability = await getAvaliability();
+    res.status(200).send(avaliability);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+}

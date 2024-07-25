@@ -63,3 +63,8 @@ export const addAvaliability = async (
       .execute();
   }
 };
+
+
+export const getAvaliability = async () => {
+  return AppDataSource.manager.find(PersonAvaliability);
+};
