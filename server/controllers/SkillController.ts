@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 
 export const insertSkill = async (req: Request, res: Response) => {
   try {
-    const skillName = req.body.skillname;
+    const skillName = req.body.skillName;
     const tools = req.body.tools
     await addSkill(skillName,tools);
     res.status(201).send(`${skillName} added!`);

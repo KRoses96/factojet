@@ -7,8 +7,8 @@ export const insertTask = async (req: Request, res: Response) => {
     const skills = req.body.skills;
     const timeHours = req.body.timeHours;
     const taskName = req.body.taskName;
-    const requiredTasks = req.body.required;
-    await addTask(taskName, timeHours, projectName, skills, requiredTasks);
+    const required = req.body.required;
+    await addTask(taskName, timeHours, projectName, skills, required, false);
     res.status(201).send(`${taskName} added!`);
   } catch (error) {
     res.status(400).send(error);

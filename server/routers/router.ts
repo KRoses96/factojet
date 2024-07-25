@@ -30,7 +30,7 @@ router.delete('/skillToPerson', removeSkillToPerson)
 router.post('/project', insertProject)
 router.delete('/project', removeProject)
 router.get('/project',allProjects)
-router.put('/projectDetail', insertDetailProject)
+router.put('/project', insertDetailProject)
 
 //Task
 router.post('/task',insertTask)

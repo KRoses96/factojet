@@ -11,18 +11,23 @@ export const addSkill = async (skillname: string, tools: string) => {
     })
     .execute();
 
+    const skill = await AppDataSource.manager.findOneBy(Skill, {
+      name: skillname,
+    });
+
   const requiredTools = tools.split(",");
   for (let tool of requiredTools) {
+    console.log(tool)
     const toolId = await AppDataSource.manager
       .findOneBy(Tool, {
         name: tool,
       })
-      .then((toolFound) => (toolFound ? toolFound.id : null));
-
+      if(toolId) {
     await AppDataSource.createQueryBuilder()
-      .relation(Tool, "tasks")
-      .of(tool)
-      .add(toolId);
+      .relation(Tool, "skills")
+      .of(toolId)
+      .add(skill);
+      }
   }
 };
 

@@ -8,15 +8,14 @@ export const addTask = async (
   timeHours: number,
   project: string,
   skills: string,
-  required: string
+  required: string,
+  completed: boolean
 ) => {
   const projectId = await AppDataSource.manager
     .findOneBy(Project, {
       name: project,
     })
     .then((projectFound) => (projectFound ? projectFound.id : null));
-
-  console.log(skills);
 
   if (projectId) {
     await AppDataSource.createQueryBuilder()
@@ -26,6 +25,7 @@ export const addTask = async (
         name: taskName,
         time: timeHours,
         project: { id: projectId },
+        complete: completed
       })
       .execute();
 
@@ -40,13 +40,14 @@ export const addTask = async (
           name: skill,
         })
         .then((skillFound) => (skillFound ? skillFound.id : null));
-
+      if(skillId) {
       await AppDataSource.createQueryBuilder()
         .relation(Task, "skills")
         .of(task)
         .add(skillId);
+      }
     }
-
+    
     if(required) {
     const requiredArr = required.split(",");
     for (let taskToComplete of requiredArr) {
@@ -55,7 +56,7 @@ export const addTask = async (
       }).then((taskFound) => taskFound? taskFound.id : null)
 
       await AppDataSource.createQueryBuilder()
-      .relation(Task, "tasks")
+      .relation(Task, "required")
       .of(task)
       .add(taskToCompleteId)
     }

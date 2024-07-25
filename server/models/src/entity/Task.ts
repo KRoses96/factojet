@@ -21,7 +21,7 @@ export class Task {
   time: number;
 
   @Column ()
-  complete: false;
+  complete: boolean;
 
   @ManyToOne(() => Project, (project) => project.tasks)
   project: Project;
