@@ -6,11 +6,11 @@ import { Task } from "../models/src/entity/Task";
 import { PersonAvaliability } from "../models/src/entity/PersonAvaliability";
 
 type ScheduledTask = {
-  name: string;
+  resource: number;
+  title: string;
   project: string;
-  task: string;
-  startDate: Date;
-  endDate: Date;
+  start: Date;
+  end: Date;
 };
 
 type PossibleTask = {
@@ -24,7 +24,7 @@ type PossibleTask = {
 };
 
 type AvaliablePeople = {
-  name: string;
+  name: number;
   skills: string[];
   importance: number;
 };
@@ -152,7 +152,7 @@ export const solutionFinder = async (req: Request, res: Response) => {
       const avaliablePeople: AvaliablePeople[] = [];
       avaliable.forEach((person) => {
         avaliablePeople.push({
-          name: person.person.name,
+          name: person.person.id,
           skills: person.person.skills.map((skill) => skill.name),
           importance: person.person.skills.length,
         });
@@ -198,15 +198,15 @@ export const solutionFinder = async (req: Request, res: Response) => {
             const personKey = `${person.name}-${task.project}-${task.name}`;
             const lastTask = lastTaskMap[personKey];
 
-            if (lastTask && lastTask.endDate.getTime() === nextTime) {
-              lastTask.endDate = new Date(nextTime + 3600000);
+            if (lastTask && lastTask.end.getTime() === nextTime) {
+              lastTask.end = new Date(nextTime + 3600000);
             } else {
               const scheduledTask: ScheduledTask = {
-                name: person.name,
+                start: new Date(nextTime),
+                end: new Date(nextTime + 3600000),
+                title: task.name,
+                resource: person.name,
                 project: task.project,
-                task: task.name,
-                startDate: new Date(nextTime),
-                endDate: new Date(nextTime + 3600000),
               };
 
               schedule.push(scheduledTask);

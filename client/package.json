@@ -21,6 +21,8 @@
   "dependencies": {
     "@mantine/core": "7.11.2",
     "@mantine/hooks": "7.11.2",
+    "@marko19907/string-to-color": "^1.0.0",
+    "@mobiscroll/react": "npm:@mobiscroll/react-next-trial@^5.31.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1"
