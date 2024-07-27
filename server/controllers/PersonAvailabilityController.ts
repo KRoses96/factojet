@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { addAvaliability, getAvaliability } from "../models/methods/PersonAvaliabilityMethods";
+import { addAvailability, getAvaliability } from "../models/methods/PersonAvaliabilityMethods";
 
-export const insertAvaliability = (req: Request, res: Response) => {
+export const insertAvailability = (req: Request, res: Response) => {
   try {
     const personName = req.body.personName || null;
     const monday_start = req.body.monday_start || null;
@@ -19,7 +19,7 @@ export const insertAvaliability = (req: Request, res: Response) => {
     const sunday_start = req.body.sunday_start || null;
     const sunday_end = req.body.sunday_end || null;
 
-    addAvaliability(
+    addAvailability(
       personName,
       monday_start,
       monday_end,
@@ -43,7 +43,7 @@ export const insertAvaliability = (req: Request, res: Response) => {
 };
 
 
-export const allAvaliability = async(req: Request , res: Response) => {
+export const allAvailability = async(req: Request , res: Response) => {
   try {
     const avaliability = await getAvaliability();
     res.status(200).send(avaliability);

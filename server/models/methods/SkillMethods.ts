@@ -2,7 +2,7 @@ import { AppDataSource } from "../src/data-source";
 import { Skill } from "../src/entity/Skill";
 import { Tool } from "../src/entity/Tool";
 
-export const addSkill = async (skillname: string, tools: string) => {
+export const addSkill = async (skillname: string, tools: string | null) => {
   await AppDataSource.createQueryBuilder()
     .insert()
     .into(Skill)
@@ -15,6 +15,8 @@ export const addSkill = async (skillname: string, tools: string) => {
       name: skillname,
     });
 
+  //In case I decide to add the tools feauture
+  if (tools) {
   const requiredTools = tools.split(",");
   for (let tool of requiredTools) {
     console.log(tool)
@@ -29,6 +31,7 @@ export const addSkill = async (skillname: string, tools: string) => {
       .add(skill);
       }
   }
+}
 };
 
 export const getSkills = async () => {

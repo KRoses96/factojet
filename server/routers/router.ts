@@ -3,7 +3,7 @@ import { allSkills, insertSkill } from "../controllers/SkillController";
 import {  allPeople, insertPerson, insertSkillToPerson, removePerson, removeSkillToPerson } from "../controllers/PersonController";
 import { allProjects, insertDetailProject, insertProject, removeProject } from "../controllers/ProjectController";
 import { allTasks, insertTask, removeTask } from "../controllers/TaskController";
-import { allAvaliability, insertAvaliability } from "../controllers/PersonAvaliabilityController";
+import { allAvailability, insertAvailability } from "../controllers/PersonAvailabilityController";
 import { allTools, insertTool, removeTool } from "../controllers/ToolController";
 import { deleteSkill } from "../models/methods/SkillMethods";
 import { solutionFinder } from "../controllers/solutionController";
@@ -22,8 +22,8 @@ router.get('/skill', allSkills)
 router.post('/people', insertPerson)
 router.delete('/people',removePerson)
 router.get('/people', allPeople)
-router.post('/avaliability', insertAvaliability)
-router.get('/avaliability',allAvaliability)
+router.post('/avaliability', insertAvailability)
+router.get('/avaliability',allAvailability)
 router.post('/skillToPerson', insertSkillToPerson)
 router.delete('/skillToPerson', removeSkillToPerson)
 

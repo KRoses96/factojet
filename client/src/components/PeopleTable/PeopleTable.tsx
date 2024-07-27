@@ -58,7 +58,13 @@ export const PeopleTable = () => {
   const [people, setPeople] = useState<People[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
 
-  useEffect(() => {
+
+  const handleAddPerson = (newPerson: People) => {
+    getAllPeole();
+    close();
+  };
+
+  const getAllPeole = () => {
     const url = 'http://localhost:3000/avaliability';
     fetch(url, {
       headers: {
@@ -84,6 +90,10 @@ export const PeopleTable = () => {
         )
       )
       .catch((error) => console.error('Error fetching data:', error));
+  }
+
+  useEffect(() => {
+    getAllPeole()
   }, []);
 
 
@@ -119,8 +129,8 @@ export const PeopleTable = () => {
 
   return (
     <>
-    <Modal opened={opened} onClose={close} title="New Worker">
-      <PeopleForm/>
+    <Modal size='lg' opened={opened} onClose={close} title="New Worker">
+      <PeopleForm onAddPerson={handleAddPerson}/>
     </Modal>
 
     <Button onClick={open} variant="outline" size="md" radius="lg">Add New Worker</Button>

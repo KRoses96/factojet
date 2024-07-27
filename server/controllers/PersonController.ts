@@ -3,14 +3,37 @@ import {
   addPerson,
   getPeople,
   addSkillToPerson,
-  deleteSkillToPerson,  
+  deleteSkillToPerson,
   deletePerson,
 } from "../models/methods/PersonMethods";
+import { addAvailability } from "../models/methods/PersonAvaliabilityMethods";
 
 export const insertPerson = async (req: Request, res: Response) => {
   try {
-    const personName = req.body.personName;
+    console.log(req.body);
+    const { personName, availability, skills } = req.body;
     await addPerson(personName);
+    console.log(availability);
+    await addAvailability(
+      personName,
+      availability.monday_start,
+      availability.monday_end,
+      availability.tuesday_start,
+      availability.tuesday_end,
+      availability.wednesday_start,
+      availability.wednesday_end,
+      availability.thursday_start,
+      availability.thursday_end,
+      availability.friday_start,
+      availability.friday_end,
+      availability.saturday_start,
+      availability.saturday_end,
+      availability.sunday_start,
+      availability.sunday_end
+    );
+    skills.forEach(async (skill: string) => {
+      await addSkillToPerson(personName, skill);
+    });
     res.status(201).send(`${personName} added!`);
   } catch (error) {
     res.status(400).send(error);

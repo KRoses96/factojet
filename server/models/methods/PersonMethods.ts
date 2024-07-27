@@ -1,6 +1,7 @@
 import { AppDataSource } from "../src/data-source";
 import { Person } from "../src/entity/Person";
 import { Skill } from "../src/entity/Skill";
+import { addSkill } from "./SkillMethods";
 
 export const addPerson = async (name: string) => {
   await AppDataSource.createQueryBuilder()
@@ -30,9 +31,17 @@ export const addSkillToPerson = async (
   personName: string,
   skillName: string
 ) => {
-  const skillToAdd = await AppDataSource.manager.findOneBy(Skill, {
+  let skillToAdd = await AppDataSource.manager.findOneBy(Skill, {
     name: skillName,
   });
+  console.log('skillToAdd',skillToAdd)
+  if (!skillToAdd) {
+    await addSkill(skillName, null)
+
+    skillToAdd = await AppDataSource.manager.findOneBy(Skill, {
+      name: skillName,
+    });
+  }
 
   const person = await AppDataSource.manager.findOneBy(Person, {
     name: personName,

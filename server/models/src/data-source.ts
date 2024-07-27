@@ -5,7 +5,7 @@ import { Skill } from "./entity/Skill";
 import { Person } from "./entity/Person";
 import { Project } from "./entity/Project";
 import { Task } from "./entity/Task";
-import { PersonAvaliability } from "./entity/PersonAvaliability";
+import { PersonAvaliability } from "./entity/PersonAvailability";
 import { Tool } from "./entity/Tool";
 
 export const AppDataSource = new DataSource({

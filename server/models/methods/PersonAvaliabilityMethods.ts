@@ -1,8 +1,8 @@
 import { AppDataSource } from "../src/data-source";
-import { PersonAvaliability } from "../src/entity/PersonAvaliability";
+import { PersonAvaliability } from "../src/entity/PersonAvailability";
 import { Person } from "../src/entity/Person";
 
-export const addAvaliability = async (
+export const addAvailability = async (
   personName: string,
   monday_start: number | null,
   monday_end: number | null,
@@ -19,6 +19,7 @@ export const addAvaliability = async (
   sunday_start: number | null,
   sunday_end: number | null
 ) => {
+  console.log("hello");
   const personId = await AppDataSource.manager
     .findOneBy(Person, {
       name: personName,
@@ -64,8 +65,8 @@ export const addAvaliability = async (
   }
 };
 
-
 export const getAvaliability = async () => {
-  return AppDataSource.getRepository(PersonAvaliability)
-  .find({ relations: ["person", "person.skills"] });
+  return AppDataSource.getRepository(PersonAvaliability).find({
+    relations: ["person", "person.skills"],
+  });
 };

@@ -3,7 +3,7 @@ import { AppDataSource } from "../models/src/data-source";
 import { Person } from "../models/src/entity/Person";
 import { Project } from "../models/src/entity/Project";
 import { Task } from "../models/src/entity/Task";
-import { PersonAvaliability } from "../models/src/entity/PersonAvaliability";
+import { PersonAvaliability } from "../models/src/entity/PersonAvailability";
 
 type ScheduledTask = {
   resource: number;
