@@ -66,5 +66,6 @@ export const addAvaliability = async (
 
 
 export const getAvaliability = async () => {
-  return AppDataSource.manager.find(PersonAvaliability);
+  return AppDataSource.getRepository(PersonAvaliability)
+  .find({ relations: ["person", "person.skills"] });
 };

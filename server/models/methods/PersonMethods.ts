@@ -21,7 +21,9 @@ export const deletePerson = async (name: string) => {
 };
 
 export const getPeople = async () => {
-  return AppDataSource.manager.find(Person);
+  return AppDataSource.manager
+    .getRepository(Person)
+    .find({ relations: { skills: true } });
 };
 
 export const addSkillToPerson = async (

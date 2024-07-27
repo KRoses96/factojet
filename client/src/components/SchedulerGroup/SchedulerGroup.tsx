@@ -91,15 +91,13 @@ const ScheduleGroup: FC = () => {
             <Eventcalendar
               dragToMove={true}
               dragToResize={true}
-              eventDelete={true}
-              clickToCreate={true}
               view={myView}
               data={myEvents}
               resources={filteredResources}
             />
           </div>
           <div className="mbsc-col-sm-3">
-            <div className="mbsc-form-group-title">Show available tasks</div>
+            <div className="mbsc-form-group-title">Workers</div>
             <div>
               {myResources.map((resource) => (
                 <Checkbox
