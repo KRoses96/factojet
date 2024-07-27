@@ -1,4 +1,5 @@
 import '@mobiscroll/react/dist/css/mobiscroll.min.css';
+import './SchedulerGroup.css';
 import {
   Eventcalendar,
   getJson,
@@ -11,26 +12,47 @@ import {
 } from '@mobiscroll/react';
 import { FC, useEffect, useMemo, useState, ChangeEvent, useCallback } from 'react';
 import { generateColorRGB } from '@marko19907/string-to-color';
-
-const colorOptions = { saturation: 50, lightness: 75, alpha: 100 };
+import { Space, Divider, Title, Text, Flex, Table, ColorSwatch } from '@mantine/core';
+import { DonutChart } from '@mantine/charts';
+const colorOptions = { saturation: 45, lightness: 55, alpha: 100 };
 
 setOptions({
   theme: 'windows',
   themeVariant: 'dark',
 });
 
+type RespProject = {
+  id: number;
+  name: string;
+  details: string | null;
+  start_date: Date;
+  priority: number;
+  tasks: {
+    id: number;
+    name: string;
+    time: number;
+    complete: boolean;
+    skills: { id: string; name: string }[];
+  }[];
+};
+
 const ScheduleGroup: FC = () => {
   const [myEvents, setEvents] = useState<MbscCalendarEvent[]>([]);
   const [myResources, setResources] = useState<MbscResource[]>([]);
   const [activeResourceIds, setActiveResourceIds] = useState<Set<number>>(new Set());
+  const [workedTimeData, setWorkedTimeData] = useState<
+    { name: string; value: number; color: string }[]
+  >([]);
+
+  const [projects, setProjects] = useState<RespProject[]>([]);
 
   const myView = useMemo<MbscEventcalendarView>(
     () => ({
       schedule: {
-        type: 'week',
+        type: 'day',
         allDay: false,
-        startDay: 1,
-        endDay: 7,
+        startDay: 0,
+        endDay: 6,
         startTime: '07:00',
         endTime: '20:00',
       },
@@ -38,38 +60,85 @@ const ScheduleGroup: FC = () => {
     []
   );
 
-  const filter = useCallback(
-    (ev: ChangeEvent<HTMLInputElement>) => {
-      const resourceId = parseInt(ev.target.value, 10);
-      setActiveResourceIds(prev => {
-        const newSet = new Set(prev);
-        if (ev.target.checked) {
-          newSet.add(resourceId);
-        } else {
-          newSet.delete(resourceId);
+  const processWorkedTimeData = useCallback(() => {
+    const workedTime: { [key: string]: number } = {};
+
+    myEvents.forEach((event: MbscCalendarEvent) => {
+      if (
+        event.resource &&
+        event.start &&
+        event.end &&
+        typeof event.start !== 'object' &&
+        typeof event.end !== 'object'
+      ) {
+        const resourceId = event.resource;
+        const resource = myResources.find((r) => r.id === resourceId);
+        if (resource) {
+          const start = new Date(event.start);
+          const end = new Date(event.end);
+          const duration = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // Duration in hours
+          workedTime[resource.name as keyof typeof workedTime] =
+            (workedTime[resource.name as keyof typeof workedTime] || 0) + duration;
         }
-        return newSet;
-      });
-    },
-    []
-  );
+      }
+    });
+
+    const newWorkedTimeData = Object.entries(workedTime).map(([name, value]) => ({
+      name,
+      value: parseFloat(value.toFixed(2)), // Round to 2 decimal places
+      color: generateColorRGB(name, colorOptions),
+    }));
+
+    setWorkedTimeData(newWorkedTimeData);
+  }, [myEvents, myResources]);
+
+  const filter = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
+    const resourceId = parseInt(ev.target.value, 10);
+    setActiveResourceIds((prev) => {
+      const newSet = new Set(prev);
+      if (ev.target.checked) {
+        newSet.add(resourceId);
+      } else {
+        newSet.delete(resourceId);
+      }
+      return newSet;
+    });
+  }, []);
 
   const filteredResources = useMemo(() => {
-    return myResources.filter(r => activeResourceIds.has(typeof r.id === 'number'? r.id : 0));
+    return myResources.filter((r) => activeResourceIds.has(typeof r.id === 'number' ? r.id : 0));
   }, [myResources, activeResourceIds]);
+
+  useEffect(() => {
+    const url = 'http://localhost:3000/project';
+    processWorkedTimeData();
+    fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((resp) => resp.json())
+      .then((data) => setProjects(data));
+  }, [myEvents, myResources, processWorkedTimeData]);
 
   useEffect(() => {
     getJson(
       'http://localhost:3000/people',
       (resources) => {
-        let resourceArr: MbscResource[] = resources.map((resource: { name: string; id: number }) => ({
-          id: resource.id,
-          name: resource.name,
-          color: generateColorRGB(resource.name, colorOptions),
-        })).filter((r : {name: string; id:number}) => r.name && r.id);
-        
+        let resourceArr: MbscResource[] = resources
+          .map((resource: { name: string; id: number }) => ({
+            id: resource.id,
+            name: resource.name,
+            color: generateColorRGB(resource.name, colorOptions),
+          }))
+          .filter((resource: { name: string; id: number }) => resource.name && resource.id);
+
         setResources(resourceArr);
-        setActiveResourceIds(new Set(resourceArr.map(r => typeof r.id === 'number'? r.id : 0)));
+        setActiveResourceIds(
+          new Set(
+            resourceArr.map((resource) => (typeof resource.id === 'number' ? resource.id : 0))
+          )
+        );
       },
       'json'
     );
@@ -101,7 +170,7 @@ const ScheduleGroup: FC = () => {
             <div>
               {myResources.map((resource) => (
                 <Checkbox
-                  checked={activeResourceIds.has(typeof resource.id === 'number'? resource.id : 0)}
+                  checked={activeResourceIds.has(typeof resource.id === 'number' ? resource.id : 0)}
                   onChange={filter}
                   value={resource.id.toString()}
                   label={resource.name}
@@ -112,6 +181,97 @@ const ScheduleGroup: FC = () => {
           </div>
         </div>
       </div>
+      <Space h="md" />
+      <Divider size="sm" />
+      <div className="report">
+        <Title className='' td="underline" order={1}>
+          Solution Report
+        </Title>
+      </div>
+      <Flex mih={50} gap="md" justify="left" align="center" direction="row" wrap="nowrap">
+        <div className='project-table'>
+          <Table striped withTableBorder withColumnBorders>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Project</Table.Th>
+                <Table.Th>Total Hours</Table.Th>
+                <Table.Th>Estimated Completion</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {projects.map((project) => {
+                const projectEvents = myEvents.filter(
+                  (event) => 
+                    event.title && event.title.split('-')[0].trim() === project.name.trim()
+                );
+                console.log(projectEvents)
+                const latestEndDate = projectEvents.reduce((latest, event) => {
+                  console.log(event)
+                  if (event.end && typeof event.end !== 'object') {
+                    const endDate = new Date(event.end);
+                    console.log(endDate)
+                    return endDate > latest ? endDate : latest;
+                  }
+                  return latest;
+                }, new Date(0));
+
+                return (
+                  <Table.Tr key={project.name}>
+                    <Table.Td>{project.name}</Table.Td>
+                    <Table.Td>{project.tasks.reduce((ac, task) => ac + task.time, 0)}</Table.Td>
+                    <Table.Td>
+                      {latestEndDate.getTime() > 0 ? latestEndDate.toLocaleDateString() : 'N/A'}
+                    </Table.Td>
+                  </Table.Tr>
+                );
+              })}
+            </Table.Tbody>
+          </Table>
+        </div>
+        <Divider orientation="vertical" />
+        <div className="donut">
+          <Text className="skillset-text" fz="lg" mb="xs" ta="center">
+            Work Distribution
+          </Text>
+          <DonutChart
+            mx="auto"
+            withTooltip={false}
+            h={300}
+            w={300}
+            size={230}
+            key="worked-time-chart"
+            paddingAngle={9}
+            data={workedTimeData}
+            tooltipDataSource="segment"
+          />
+        </div>
+
+        <div className="donut-table">
+          <Table>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Color</Table.Th>
+                <Table.Th>Worker</Table.Th>
+                <Table.Th>Time(Hours)</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {workedTimeData.map((person) => (
+                <>
+                  <Table.Tr key={person.name}>
+                    <Table.Td>
+                      {' '}
+                      <ColorSwatch color={generateColorRGB(person.name, colorOptions)} />
+                    </Table.Td>
+                    <Table.Td>{person.name}</Table.Td>
+                    <Table.Td>{person.value}</Table.Td>
+                  </Table.Tr>
+                </>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </div>
+      </Flex>
     </Page>
   );
 };

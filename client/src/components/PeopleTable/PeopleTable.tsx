@@ -3,8 +3,9 @@ import { Table, Badge, rem, Modal, Button, Space } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { PeopleForm } from '../PeopleForm/PeopleForm';
+import { generateColorRGB } from '@marko19907/string-to-color';
 
-
+const colorOptions = { saturation: 50, lightness: 55, alpha: 80 };
 
 type Person = {
   id: number;
@@ -59,7 +60,7 @@ export const PeopleTable = () => {
   const [opened, { open, close }] = useDisclosure(false);
 
 
-  const handleAddPerson = (newPerson: People) => {
+  const handleAddPerson = () => {
     getAllPeole();
     close();
   };
@@ -116,7 +117,7 @@ export const PeopleTable = () => {
   const rows = people.map((person) => (
     <Table.Tr key={person.name}>
       <Table.Td>{person.name}</Table.Td>
-      <Table.Td>{person.skills.map((skill) => <> <Badge className='skills' key={skill} color='blue'>{skill}</Badge> <span></span> </> )}</Table.Td>
+      <Table.Td>{person.skills.map((skill) => <> <Badge className='skills' key={skill} color={generateColorRGB(skill,colorOptions)}>{skill}</Badge> <span></span> </> )}</Table.Td>
       <Table.Td>{person.weekAvaliability.monday? <IconCheck style={iconStyle} /> :  <IconX style={iconStyle} />} </Table.Td>
       <Table.Td>{person.weekAvaliability.tuesday? <IconCheck style={iconStyle} /> :  <IconX style={iconStyle} />} </Table.Td>
       <Table.Td>{person.weekAvaliability.wednesday? <IconCheck style={iconStyle} /> :  <IconX style={iconStyle} />} </Table.Td>

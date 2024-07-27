@@ -204,7 +204,7 @@ export const solutionFinder = async (req: Request, res: Response) => {
               const scheduledTask: ScheduledTask = {
                 start: new Date(nextTime),
                 end: new Date(nextTime + 3600000),
-                title: task.name,
+                title: task.project + ' - ' + task.name,
                 resource: person.name,
                 project: task.project,
               };

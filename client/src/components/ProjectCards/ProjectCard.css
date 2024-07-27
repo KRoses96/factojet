@@ -1,0 +1,20 @@
+.card{
+  padding-left: 3%;
+  width: 55%;
+}
+
+.donut{
+  width: 25%;
+}
+
+.donut-table{
+  width: 15%;
+}
+
+.projects{
+  background: #202020;
+}
+
+.skillset-text{
+  padding-top: 2%;
+}

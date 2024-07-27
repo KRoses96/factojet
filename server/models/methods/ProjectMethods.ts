@@ -14,7 +14,8 @@ export const addProject = async (projectName: string, startDate: Date, priority:
 };
 
 export const getProjects = async () => {
-  return AppDataSource.manager.find(Project);
+  return AppDataSource.getRepository(Project).find({
+    relations: ["tasks", "tasks.skills"]})
 };
 
 export const deleteProject = async (name: string) => {
