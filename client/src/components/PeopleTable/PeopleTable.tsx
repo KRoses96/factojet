@@ -7,13 +7,13 @@ import { generateColorRGB } from '@marko19907/string-to-color';
 
 const colorOptions = { saturation: 50, lightness: 55, alpha: 80 };
 
-type Person = {
+export type Person = {
   id: number;
   name: string;
   skills: Skill[];
 };
 
-type RespAvaliability = {
+export type RespAvaliability = {
   id: number;
   person: Person;
   monday_start: number;
@@ -62,8 +62,7 @@ export const PeopleTable = () => {
 
   const handleAddPerson = () => {
     getAllPeole();
-    close();
-    setSelectedPerson(null)
+    handleCloseModal()
   };
 
   const handleRowClick = (personId: number) => {
@@ -71,6 +70,10 @@ export const PeopleTable = () => {
     open();
   };
 
+  const handleCloseModal = () => {
+    close();
+    setSelectedPerson(null);
+  };
 
   const getAllPeole = () => {
     const url = 'http://localhost:3000/avaliability';
@@ -188,8 +191,8 @@ export const PeopleTable = () => {
 
   return (
     <>
-      <Modal size="lg" opened={opened} onClose={close} title="New Worker">
-        <PeopleForm onAddPerson={handleAddPerson} />
+      <Modal size="lg"  opened={opened} onClose={handleCloseModal} title="New Worker">
+        <PeopleForm selectedPerson = {selectedPerson} onAddPerson={handleAddPerson} />
       </Modal>
 
       <Button onClick={open} variant="outline" size="md" radius="lg">

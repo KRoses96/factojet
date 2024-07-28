@@ -5,8 +5,9 @@ import {
   addSkillToPerson,
   deleteSkillToPerson,
   deletePerson,
+  getInfoPerson,
 } from "../models/methods/PersonMethods";
-import { addAvailability } from "../models/methods/PersonAvaliabilityMethods";
+import { addAvailability, getAvaliability, getSingleAvaliability } from "../models/methods/PersonAvaliabilityMethods";
 
 export const insertPerson = async (req: Request, res: Response) => {
   try {
@@ -42,13 +43,14 @@ export const insertPerson = async (req: Request, res: Response) => {
 
 export const removePerson = async (req: Request, res: Response) => {
   try {
-    const personName = req.body.personName;
-    await deletePerson(personName);
-    res.status(201).send(`${personName} removed!`);
+    const personId = req.params.personId
+    await deletePerson(parseInt(personId));
+    res.status(201).send(`${personId} removed!`);
   } catch (error) {
     res.status(400).send(error);
   }
 };
+
 
 export const allPeople = async (req: Request, res: Response) => {
   try {
@@ -58,6 +60,16 @@ export const allPeople = async (req: Request, res: Response) => {
     res.status(400).send(error);
   }
 };
+
+export const findPerson = async (req: Request, res: Response) => {
+  try {
+    const personId = req.params.personId
+    const person = await getSingleAvaliability(parseInt(personId))
+    res.status(200).send(person)
+  } catch (error) {
+    res.status(400).send(error)
+  }
+}
 
 export const insertSkillToPerson = async (req: Request, res: Response) => {
   try {
@@ -80,3 +92,56 @@ export const removeSkillToPerson = async (req: Request, res: Response) => {
     res.status(400).send(error);
   }
 };
+
+
+
+export const insertAvailability = (req: Request, res: Response) => {
+  try {
+    const personName = req.body.personName || null;
+    const monday_start = req.body.monday_start || null;
+    const monday_end = req.body.monday_end || null;
+    const tuesday_start = req.body.tuesday_start || null;
+    const tuesday_end = req.body.tuesday_end || null;
+    const wednesday_start = req.body.wednesday_start || null;
+    const wednesday_end = req.body.wednesday_end || null;
+    const thursday_start = req.body.thursday_start || null;
+    const thursday_end = req.body.thursday_end || null;
+    const friday_start = req.body.friday_start || null;
+    const friday_end = req.body.friday_end || null;
+    const saturday_start = req.body.saturday_start || null;
+    const saturday_end = req.body.saturday_end || null;
+    const sunday_start = req.body.sunday_start || null;
+    const sunday_end = req.body.sunday_end || null;
+
+    addAvailability(
+      personName,
+      monday_start,
+      monday_end,
+      tuesday_start,
+      tuesday_end,
+      wednesday_start,
+      wednesday_end,
+      thursday_start,
+      thursday_end,
+      friday_start,
+      friday_end,
+      saturday_start,
+      saturday_end,
+      sunday_start,
+      sunday_end
+    );
+    res.status(201).send('Avaliability added!')
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+
+export const allAvailability = async(req: Request , res: Response) => {
+  try {
+    const avaliability = await getAvaliability();
+    res.status(200).send(avaliability);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+}

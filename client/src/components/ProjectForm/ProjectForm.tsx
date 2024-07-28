@@ -29,7 +29,6 @@ type ResponseProject = {
 export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFormProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [submittedValues, setSubmittedValues] = useState<FormProject | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   
   const url = 'http://localhost:3000/project'; //Endpoint for all project related changes
 
@@ -62,12 +61,8 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
 
   useEffect(() => {
     if (editProject && projectId) {
-      setIsLoading(true);
-      getProject().then(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
-    }
-  }, [editProject, projectId]);
+      getProject();
+  }}, [editProject, projectId]);
 
   const form = useForm<FormProject>({
     initialValues: projectData,
@@ -123,9 +118,6 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
     }).then(() => onAddProject());
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>

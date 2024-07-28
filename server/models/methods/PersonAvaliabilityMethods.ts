@@ -70,3 +70,12 @@ export const getAvaliability = async () => {
     relations: ["person", "person.skills"],
   });
 };
+
+export const getSingleAvaliability = async (personId: number) => {
+  return AppDataSource.getRepository(PersonAvaliability).findOne({
+    where: {
+      person: { id: personId },
+    },
+    relations: ["person", "person.skills"],
+  });
+};

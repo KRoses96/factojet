@@ -1,9 +1,8 @@
 import express from "express";
 import { allSkills, insertSkill } from "../controllers/SkillController";
-import {  allPeople, insertPerson, insertSkillToPerson, removePerson, removeSkillToPerson } from "../controllers/PersonController";
+import {  allAvailability, allPeople, findPerson, insertAvailability, insertPerson, insertSkillToPerson, removePerson, removeSkillToPerson } from "../controllers/PersonController";
 import { allProjects, findProject, insertProject, removeProject, updateProject } from "../controllers/ProjectController";
 import { allTasks, insertTask, removeTask } from "../controllers/TaskController";
-import { allAvailability, insertAvailability } from "../controllers/PersonAvailabilityController";
 import { allTools, insertTool, removeTool } from "../controllers/ToolController";
 import { deleteSkill } from "../models/methods/SkillMethods";
 import { solutionFinder } from "../controllers/SolutionController";
@@ -20,12 +19,13 @@ router.get('/skill', allSkills)
 
 //Person
 router.post('/people', insertPerson)
-router.delete('/people',removePerson)
+router.delete('/people/:personId',removePerson)
 router.get('/people', allPeople)
 router.post('/avaliability', insertAvailability)
 router.get('/avaliability',allAvailability)
 router.post('/skillToPerson', insertSkillToPerson)
 router.delete('/skillToPerson', removeSkillToPerson)
+router.get('/people/:personId', findPerson)
 
 //Project
 router.post('/project', insertProject)

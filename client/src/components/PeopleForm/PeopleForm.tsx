@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { Button, Code, Text, TextInput, TagsInput, Space, Radio, Group } from '@mantine/core';
+import { useState, useEffect } from 'react';
+import { Button, Text, TextInput, TagsInput, Space, Radio, Group } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
+import { RespAvaliability } from '../PeopleTable/PeopleTable';
 
 type FormPerson = {
   name: string;
@@ -16,28 +17,32 @@ type FormPerson = {
 
 type PeopleFormProps = {
   onAddPerson: () => void;
+  selectedPerson: number | null;
 };
 
-export const PeopleForm = ({ onAddPerson }: PeopleFormProps) => {
+export const PeopleForm = ({ onAddPerson, selectedPerson }: PeopleFormProps) => {
+  const [submittedValues, setSubmittedValues] = useState<FormPerson | null>(null);
+  const [personData, setPersonData] = useState<FormPerson>({
+    name: '',
+    tags: [],
+    monday: 'fullTime',
+    tuesday: 'fullTime',
+    wednesday: 'fullTime',
+    thursday: 'fullTime',
+    friday: 'fullTime',
+    saturday: 'dayOff',
+    sunday: 'dayOff',
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const url = 'http://localhost:3000/people';
+
   const form = useForm({
-    initialValues: {
-      name: '',
-      tags: [],
-      monday: 'fullTime',
-      tuesday: 'fullTime',
-      wednesday: 'fullTime',
-      thursday: 'fullTime',
-      friday: 'fullTime',
-      saturday: 'dayOff',
-      sunday: 'dayOff',
-    },
+    initialValues: personData,
     validate: {
       name: hasLength({ min: 3 }, 'Must be at least 3 characters'),
     },
   });
-
-  const [submittedValues, setSubmittedValues] = useState<FormPerson | null>(null);
-  
 
   const typeSchedules = {
     fullTime: [8, 18],
@@ -46,9 +51,47 @@ export const PeopleForm = ({ onAddPerson }: PeopleFormProps) => {
     dayOff: [0, 0],
   };
 
+  useEffect(() => {
+    if (selectedPerson) {
+      setIsLoading(true);
+      fetch(url + `/${selectedPerson}`, {
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then((response) => response.json())
+        .then((person: RespAvaliability) => {
+          const mapShift = (start: number, end: number) => {
+            if (start === 8 && end === 18) return 'fullTime';
+            if (start === 8 && end === 13) return 'morningShift';
+            if (start === 14 && end === 18) return 'afternoonShift';
+            return 'dayOff';
+          };
+
+          const newPersonData = {
+            name: person.person.name,
+            tags: person.person.skills.map((skill) => skill.name),
+            monday: mapShift(person.monday_start, person.monday_end),
+            tuesday: mapShift(person.tuesday_start, person.tuesday_end),
+            wednesday: mapShift(person.wednesday_start, person.wednesday_end),
+            thursday: mapShift(person.thursday_start, person.thursday_end),
+            friday: mapShift(person.friday_start, person.friday_end),
+            saturday: mapShift(person.saturday_start, person.saturday_end),
+            sunday: mapShift(person.sunday_start, person.sunday_end),
+          };
+
+          setPersonData(newPersonData);
+          form.setValues(newPersonData);
+        })
+        .catch((error) => {
+          console.error('Error fetching person data:', error);
+          // You might want to set an error state here and display it to the user
+        })
+        .finally(() => setIsLoading(false));
+    }
+  }, [selectedPerson]);
+
   const skillNameCleaner = (string: string) => {
-    return string.trim().split(' ').join('-').toLowerCase()
-  }
+    return string.trim().split(' ').join('-').toLowerCase();
+  };
 
   const handleSubmit = (values: FormPerson) => {
     setSubmittedValues(values);
@@ -73,42 +116,53 @@ export const PeopleForm = ({ onAddPerson }: PeopleFormProps) => {
           sunday_start: typeSchedules[values.sunday as keyof typeof typeSchedules][0],
           sunday_end: typeSchedules[values.sunday as keyof typeof typeSchedules][1],
         },
-        skills: values.tags.map((tag) => skillNameCleaner(tag))
+        skills: values.tags.map((tag) => skillNameCleaner(tag)),
       }),
       headers: { 'Content-Type': 'application/json' },
-    }).then(() => 
-      onAddPerson())
+    }).then(() => onAddPerson());
   };
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
-      <TextInput {...form.getInputProps('name')} label="Name" placeholder="Name" />
-      <Space h="md" />
-      <TagsInput
-        {...form.getInputProps('tags')}
-        label="Skill Set"
-        placeholder="Enter tag"
-        clearable
-      />
-
-      <Space h="md" />
-      {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => (
-        <div key={day}>
-          <Radio.Group {...form.getInputProps(day)} name={day} label={day.charAt(0).toUpperCase() + day.slice(1)}>
-            <Group mt="xs">
-              <Radio value="fullTime" label="Full-Time" />
-              <Radio value="morningShift" label="Morning-Shift" />
-              <Radio value="afternoonShift" label="Afternoon-Shift" />
-              <Radio value="dayOff" label="Day-Off" />
-            </Group>
-          </Radio.Group>
+      {isLoading ? (
+        <Text>Loading...</Text>
+      ) : (
+        <>
+          <TextInput {...form.getInputProps('name')} label="Name" placeholder="Name" />
           <Space h="md" />
-        </div>
-      ))}
+          <TagsInput
+            {...form.getInputProps('tags')}
+            label="Skill Set"
+            placeholder="Enter tag"
+            clearable
+          />
 
-      <Button type="submit" mt="md">
-        Submit
-      </Button>
+          <Space h="md" />
+          {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(
+            (day) => (
+              <div key={day}>
+                <Radio.Group
+                  {...form.getInputProps(day)}
+                  name={day}
+                  label={day.charAt(0).toUpperCase() + day.slice(1)}
+                >
+                  <Group mt="xs">
+                    <Radio value="fullTime" label="Full-Time" />
+                    <Radio value="morningShift" label="Morning-Shift" />
+                    <Radio value="afternoonShift" label="Afternoon-Shift" />
+                    <Radio value="dayOff" label="Day-Off" />
+                  </Group>
+                </Radio.Group>
+                <Space h="md" />
+              </div>
+            )
+          )}
+
+          <Button type="submit" mt="md">
+            {selectedPerson? (<>Save</>) : (<>Add</>)}
+          </Button>
+        </>
+      )}
     </form>
   );
 };

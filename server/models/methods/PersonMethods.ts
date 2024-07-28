@@ -13,11 +13,11 @@ export const addPerson = async (name: string) => {
     .execute();
 };
 
-export const deletePerson = async (name: string) => {
+export const deletePerson = async (id: number) => {
   await AppDataSource.createQueryBuilder()
     .delete()
     .from(Person)
-    .where("name = :name", { name: name })
+    .where("id = :id", { id: id })
     .execute();
 };
 
@@ -26,6 +26,13 @@ export const getPeople = async () => {
     .getRepository(Person)
     .find({ relations: { skills: true } });
 };
+
+export const getInfoPerson = async(personId: number) => {
+  const person = await AppDataSource.getRepository(Person).findOne({where : {
+    id: personId
+  }, relations: ['skills']})
+  return person
+}
 
 export const addSkillToPerson = async (
   personName: string,
