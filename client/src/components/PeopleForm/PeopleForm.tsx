@@ -15,7 +15,7 @@ type FormPerson = {
 };
 
 type PeopleFormProps = {
-  onAddPerson: (person: FormPerson) => void;
+  onAddPerson: () => void;
 };
 
 export const PeopleForm = ({ onAddPerson }: PeopleFormProps) => {
@@ -75,20 +75,8 @@ export const PeopleForm = ({ onAddPerson }: PeopleFormProps) => {
         skills: values.tags.map((tag) => skillNameCleaner(tag))
       }),
       headers: { 'Content-Type': 'application/json' },
-    }).then(() => {
-      onAddPerson({
-        name: values.name,
-        tags: values.tags,
-        monday: values.monday,
-        tuesday: values.tuesday,
-        wednesday: values.wednesday,
-        thursday: values.thursday,
-        friday: values.friday,
-        saturday: values.saturday,
-        sunday: values.sunday,
-      });
-    })
-    .catch((error) => console.error('Error submitting form:', error));
+    }).then(() => 
+      onAddPerson())
   };
 
   return (
@@ -120,12 +108,6 @@ export const PeopleForm = ({ onAddPerson }: PeopleFormProps) => {
       <Button type="submit" mt="md">
         Submit
       </Button>
-
-      {submittedValues && (
-        <Text mt="md">
-          Submitted values: <Code block>{JSON.stringify(submittedValues, null, 2)}</Code>
-        </Text>
-      )}
     </form>
   );
 };

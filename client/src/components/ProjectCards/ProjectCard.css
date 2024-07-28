@@ -1,4 +1,5 @@
 .card{
+  padding-top: 2%;
   padding-left: 3%;
   width: 55%;
 }
@@ -18,3 +19,9 @@
 .skillset-text{
   padding-top: 2%;
 }
+
+.card-buttons{
+  padding-top: 2%;
+  padding-left: 3%;
+}
+

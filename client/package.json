@@ -21,6 +21,7 @@
   "dependencies": {
     "@mantine/charts": "^7.11.2",
     "@mantine/core": "7.11.2",
+    "@mantine/dates": "^7.11.2",
     "@mantine/form": "^7.11.2",
     "@mantine/hooks": "7.11.2",
     "@marko19907/string-to-color": "^1.0.0",

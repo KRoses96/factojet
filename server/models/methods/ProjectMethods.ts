@@ -1,14 +1,15 @@
 import { AppDataSource } from "../src/data-source";
 import { Project } from "../src/entity/Project";
 
-export const addProject = async (projectName: string, startDate: Date, priority: number) => {
+export const addProject = async (projectName: string, startDate: Date, priority: number,details: string) => {
   await AppDataSource.createQueryBuilder()
     .insert()
     .into(Project)
     .values({
       name: projectName,
       start_date: startDate,
-      priority: priority
+      priority: priority,
+      details: details
     })
     .execute();
 };
@@ -26,10 +27,17 @@ export const deleteProject = async (name: string) => {
     .execute();
 };
 
-export const addDetailProject = async (projectName: string, detail: string) => {
+export const editProject = async (projectName: string, detail: string) => {
   await AppDataSource.createQueryBuilder()
     .update(Project)
     .set({ detail: detail })
     .where("name = :name", { name: projectName })
     .execute();
 };
+
+export const getInfoProject = async(projectName: string) => {
+  const project = await AppDataSource.getRepository(Project).find({where : {
+    name: projectName
+  }})  
+  return project
+}

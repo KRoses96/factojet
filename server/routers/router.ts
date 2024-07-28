@@ -1,12 +1,12 @@
 import express from "express";
 import { allSkills, insertSkill } from "../controllers/SkillController";
 import {  allPeople, insertPerson, insertSkillToPerson, removePerson, removeSkillToPerson } from "../controllers/PersonController";
-import { allProjects, insertDetailProject, insertProject, removeProject } from "../controllers/ProjectController";
+import { allProjects, findProject, insertDetailProject, insertProject, removeProject } from "../controllers/ProjectController";
 import { allTasks, insertTask, removeTask } from "../controllers/TaskController";
 import { allAvailability, insertAvailability } from "../controllers/PersonAvailabilityController";
 import { allTools, insertTool, removeTool } from "../controllers/ToolController";
 import { deleteSkill } from "../models/methods/SkillMethods";
-import { solutionFinder } from "../controllers/solutionController";
+import { solutionFinder } from "../controllers/SolutionController";
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -32,6 +32,7 @@ router.post('/project', insertProject)
 router.delete('/project', removeProject)
 router.get('/project',allProjects)
 router.put('/project', insertDetailProject)
+router.get('/project/single', findProject)
 
 //Task
 router.post('/task',insertTask)
