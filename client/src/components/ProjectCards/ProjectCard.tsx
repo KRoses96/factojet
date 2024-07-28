@@ -1,9 +1,9 @@
-import { Card, Flex, ColorSwatch, Table, Space, Text, Divider } from '@mantine/core';
-import { Page } from '@mobiscroll/react';
-import { useState, useEffect, Fragment } from 'react';
+import { Card, Flex, ColorSwatch, Table, Space, Text, Divider, Button, Modal } from '@mantine/core';
+import { useState, useEffect, Fragment} from 'react';
 import { DonutChart } from '@mantine/charts';
 import { generateColorRGB } from '@marko19907/string-to-color';
 import './ProjectCard.css';
+import { useDisclosure } from '@mantine/hooks';
 
 type RespProject = {
   id: number;
@@ -48,6 +48,7 @@ const colorOptions = { saturation: 50, lightness: 55, alpha: 80 };
 
 export const ProjectCard = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const prioText = {
     1: 'Ignore',
@@ -102,7 +103,7 @@ export const ProjectCard = () => {
   }, []);
 
   const cards = projects.map((project, i) => (
-    <>
+    
     <Fragment key={i}>
       <Flex mih={50} gap="md" justify="left" align="center" direction="row" wrap="nowrap">
         <div className="card">
@@ -159,7 +160,6 @@ export const ProjectCard = () => {
             </Table.Thead>
             <Table.Tbody>
               {project.skills.map((skill) => (
-                <>
                   <Table.Tr key={skill.name}>
                     <Table.Td>
                       {' '}
@@ -168,7 +168,6 @@ export const ProjectCard = () => {
                     <Table.Td>{skill.name}</Table.Td>
                     <Table.Td>{skill.time}</Table.Td>
                   </Table.Tr>
-                </>
               ))}
             </Table.Tbody>
           </Table>
@@ -184,8 +183,22 @@ export const ProjectCard = () => {
           </>
         ) : null}
       </Fragment>
-    </>
+    
   ));
 
-  return <div className="projects">{cards}</div>;
+  return (
+  <>
+  <Modal size="lg" opened={opened} onClose={close} title="New Project">
+        Yo
+  </Modal>
+  <div>
+    <Button onClick={open} variant="outline" size="md" radius="lg">
+        Create New Project
+      </Button>
+  </div>
+  <Space h='md'/>
+  <div className="projects">
+    {cards}
+  </div>
+  </>);
 };

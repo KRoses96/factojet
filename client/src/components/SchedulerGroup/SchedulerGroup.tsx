@@ -21,6 +21,14 @@ setOptions({
   themeVariant: 'dark',
 });
 
+
+const optionsDate: Intl.DateTimeFormatOptions = {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+};
+
 type RespProject = {
   id: number;
   name: string;
@@ -153,111 +161,116 @@ const ScheduleGroup: FC = () => {
   }, []);
 
   return (
-    <Page>
-      <div className="mbsc-grid mbsc-no-padding">
-        <div className="mbsc-row">
-          <div className="mbsc-col-sm-9">
-            <Eventcalendar
-              dragToMove={true}
-              dragToResize={true}
-              view={myView}
-              data={myEvents}
-              resources={filteredResources}
-            />
-          </div>
-          <div className="mbsc-col-sm-3">
-            <div className="mbsc-form-group-title">Workers</div>
-            <div>
-              {myResources.map((resource) => (
-                <Checkbox
-                  checked={activeResourceIds.has(typeof resource.id === 'number' ? resource.id : 0)}
-                  onChange={filter}
-                  value={resource.id.toString()}
-                  label={resource.name}
-                  key={resource.id}
-                />
-              ))}
+    <>
+      <Page>
+        <div className="mbsc-grid mbsc-no-padding">
+          <div className="mbsc-row">
+            <div className="mbsc-col-sm-9">
+              <Eventcalendar
+                dragToMove={true}
+                dragToResize={true}
+                view={myView}
+                data={myEvents}
+                resources={filteredResources}
+              />
+            </div>
+            <div className="mbsc-col-sm-3">
+              <div className="mbsc-form-group-title">Workers</div>
+              <div>
+                {myResources.map((resource) => (
+                  <Checkbox
+                    checked={activeResourceIds.has(
+                      typeof resource.id === 'number' ? resource.id : 0
+                    )}
+                    onChange={filter}
+                    value={resource.id.toString()}
+                    label={resource.name}
+                    key={resource.id}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Page>
       <Space h="md" />
       <Divider size="sm" />
-      <div className="report">
-        <Title className='' td="underline" order={1}>
-          Solution Report
-        </Title>
-      </div>
-      <Flex mih={50} gap="md" justify="left" align="center" direction="row" wrap="nowrap">
-        <div className='project-table'>
-          <Table striped withTableBorder withColumnBorders>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Project</Table.Th>
-                <Table.Th>Total Hours</Table.Th>
-                <Table.Th>Estimated Completion</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {projects.map((project) => {
-                const projectEvents = myEvents.filter(
-                  (event) => 
-                    event.title && event.title.split('-')[0].trim() === project.name.trim()
-                );
-                console.log(projectEvents)
-                const latestEndDate = projectEvents.reduce((latest, event) => {
-                  console.log(event)
-                  if (event.end && typeof event.end !== 'object') {
-                    const endDate = new Date(event.end);
-                    console.log(endDate)
-                    return endDate > latest ? endDate : latest;
-                  }
-                  return latest;
-                }, new Date(0));
-
-                return (
-                  <Table.Tr key={project.name}>
-                    <Table.Td>{project.name}</Table.Td>
-                    <Table.Td>{project.tasks.reduce((ac, task) => ac + task.time, 0)}</Table.Td>
-                    <Table.Td>
-                      {latestEndDate.getTime() > 0 ? latestEndDate.toLocaleDateString() : 'N/A'}
-                    </Table.Td>
-                  </Table.Tr>
-                );
-              })}
-            </Table.Tbody>
-          </Table>
+      <Space h="md" />
+      <div className="report-body">
+        <div className="report">
+          <Title className="" td="underline" order={1}>
+            Solution Report
+          </Title>
         </div>
-        <Divider orientation="vertical" />
-        <div className="donut">
-          <Text className="skillset-text" fz="lg" mb="xs" ta="center">
-            Work Distribution
-          </Text>
-          <DonutChart
-            mx="auto"
-            withTooltip={false}
-            h={300}
-            w={300}
-            size={230}
-            key="worked-time-chart"
-            paddingAngle={9}
-            data={workedTimeData}
-            tooltipDataSource="segment"
-          />
-        </div>
+        <Space h="xl" />
+        <Flex mih={50} gap="md" justify="left" align="center" direction="row" wrap="nowrap">
+          <div className="project-table">
+            <Table striped withTableBorder withColumnBorders>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Project</Table.Th>
+                  <Table.Th>Total Hours</Table.Th>
+                  <Table.Th>Estimated Completion</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {projects.map((project) => {
+                  const projectEvents = myEvents.filter(
+                    (event) =>
+                      event.title && event.title.split('-')[0].trim() === project.name.trim()
+                  );
+                  const latestEndDate = projectEvents.reduce((latest, event) => {
+                    if (event.end && typeof event.end !== 'object') {
+                      const endDate = new Date(event.end);
+                      return endDate > latest ? endDate : latest;
+                    }
+                    return latest;
+                  }, new Date(0));
 
-        <div className="donut-table">
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Color</Table.Th>
-                <Table.Th>Worker</Table.Th>
-                <Table.Th>Time(Hours)</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {workedTimeData.map((person) => (
-                <>
+                  return (
+                    <Table.Tr key={project.name}>
+                      <Table.Td>{project.name}</Table.Td>
+                      <Table.Td>{project.tasks.reduce((ac, task) => ac + task.time, 0)}</Table.Td>
+                      <Table.Td>
+                        {latestEndDate.getTime() > 0
+                          ? latestEndDate.toLocaleDateString('en-US', optionsDate)
+                          : 'N/A'}
+                      </Table.Td>
+                    </Table.Tr>
+                  );
+                })}
+              </Table.Tbody>
+            </Table>
+          </div>
+          <Divider orientation="vertical" />
+          <div className="donut">
+            <Text className="skillset-text" fz="xl" mb="xs" ta="center">
+              Work Distribution
+            </Text>
+            <DonutChart
+              mx="auto"
+              withTooltip={false}
+              h={300}
+              w={300}
+              size={230}
+              key={JSON.stringify(workedTimeData)}
+              paddingAngle={9}
+              data={workedTimeData}
+              tooltipDataSource="segment"
+            />
+          </div>
+
+          <div className="donut-table">
+            <Table>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Color</Table.Th>
+                  <Table.Th>Worker</Table.Th>
+                  <Table.Th>Time(Hours)</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {workedTimeData.map((person) => (
                   <Table.Tr key={person.name}>
                     <Table.Td>
                       {' '}
@@ -266,13 +279,13 @@ const ScheduleGroup: FC = () => {
                     <Table.Td>{person.name}</Table.Td>
                     <Table.Td>{person.value}</Table.Td>
                   </Table.Tr>
-                </>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </div>
-      </Flex>
-    </Page>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </div>
+        </Flex>
+      </div>
+    </>
   );
 };
 

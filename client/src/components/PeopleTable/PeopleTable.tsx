@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { Table, Badge, rem, Modal, Button, Space } from '@mantine/core';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
@@ -10,7 +10,7 @@ const colorOptions = { saturation: 50, lightness: 55, alpha: 80 };
 type Person = {
   id: number;
   name: string;
-  skills: Skill[]
+  skills: Skill[];
 };
 
 type RespAvaliability = {
@@ -53,12 +53,10 @@ type People = {
 };
 
 export const PeopleTable = () => {
-
   const iconStyle = { width: rem(30), height: rem(30) };
 
   const [people, setPeople] = useState<People[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
-
 
   const handleAddPerson = () => {
     getAllPeole();
@@ -85,21 +83,19 @@ export const PeopleTable = () => {
               thursday: person.thursday_start && person.thursday_end ? true : false,
               friday: person.friday_start && person.friday_end ? true : false,
               saturday: person.saturday_start && person.saturday_end ? true : false,
-              sunday: person.sunday_start && person.sunday_end ? true : false
-            }
+              sunday: person.sunday_start && person.sunday_end ? true : false,
+            },
           }))
         )
       )
       .catch((error) => console.error('Error fetching data:', error));
-  }
+  };
 
   useEffect(() => {
-    getAllPeole()
+    getAllPeole();
   }, []);
 
-
   const ths = (
-    
     <Table.Tr>
       <Table.Th>Name</Table.Th>
       <Table.Th>Skill Set</Table.Th>
@@ -113,44 +109,96 @@ export const PeopleTable = () => {
     </Table.Tr>
   );
 
-
   const rows = people.map((person) => (
     <Table.Tr key={person.name}>
       <Table.Td>{person.name}</Table.Td>
-      <Table.Td>{person.skills.map((skill) => <> <Badge className='skills' key={skill} color={generateColorRGB(skill,colorOptions)}>{skill}</Badge> <span></span> </> )}</Table.Td>
-      <Table.Td>{person.weekAvaliability.monday? <IconCheck style={iconStyle} /> :  <IconX style={iconStyle} />} </Table.Td>
-      <Table.Td>{person.weekAvaliability.tuesday? <IconCheck style={iconStyle} /> :  <IconX style={iconStyle} />} </Table.Td>
-      <Table.Td>{person.weekAvaliability.wednesday? <IconCheck style={iconStyle} /> :  <IconX style={iconStyle} />} </Table.Td>
-      <Table.Td>{person.weekAvaliability.thursday? <IconCheck style={iconStyle} /> :  <IconX style={iconStyle} />} </Table.Td>
-      <Table.Td>{person.weekAvaliability.friday? <IconCheck style={iconStyle} /> :  <IconX style={iconStyle} />} </Table.Td>
-      <Table.Td>{person.weekAvaliability.saturday? <IconCheck style={iconStyle} /> :  <IconX style={iconStyle} />} </Table.Td>
-      <Table.Td>{person.weekAvaliability.sunday? <IconCheck style={iconStyle} /> :  <IconX style={iconStyle} />} </Table.Td>
+      <Table.Td>
+        {person.skills.map((skill) => (
+          <Fragment key={skill}>
+            <Badge className="skills" color={generateColorRGB(skill, colorOptions)}>
+              {skill}
+            </Badge>
+            <span>{' '}</span>
+          </Fragment>
+        ))}
+      </Table.Td>
+      <Table.Td>
+        {person.weekAvaliability.monday ? (
+          <IconCheck style={iconStyle} />
+        ) : (
+          <IconX style={iconStyle} />
+        )}{' '}
+      </Table.Td>
+      <Table.Td>
+        {person.weekAvaliability.tuesday ? (
+          <IconCheck style={iconStyle} />
+        ) : (
+          <IconX style={iconStyle} />
+        )}{' '}
+      </Table.Td>
+      <Table.Td>
+        {person.weekAvaliability.wednesday ? (
+          <IconCheck style={iconStyle} />
+        ) : (
+          <IconX style={iconStyle} />
+        )}{' '}
+      </Table.Td>
+      <Table.Td>
+        {person.weekAvaliability.thursday ? (
+          <IconCheck style={iconStyle} />
+        ) : (
+          <IconX style={iconStyle} />
+        )}{' '}
+      </Table.Td>
+      <Table.Td>
+        {person.weekAvaliability.friday ? (
+          <IconCheck style={iconStyle} />
+        ) : (
+          <IconX style={iconStyle} />
+        )}{' '}
+      </Table.Td>
+      <Table.Td>
+        {person.weekAvaliability.saturday ? (
+          <IconCheck style={iconStyle} />
+        ) : (
+          <IconX style={iconStyle} />
+        )}{' '}
+      </Table.Td>
+      <Table.Td>
+        {person.weekAvaliability.sunday ? (
+          <IconCheck style={iconStyle} />
+        ) : (
+          <IconX style={iconStyle} />
+        )}{' '}
+      </Table.Td>
     </Table.Tr>
   ));
 
   return (
     <>
-    <Modal size='lg' opened={opened} onClose={close} title="New Worker">
-      <PeopleForm onAddPerson={handleAddPerson}/>
-    </Modal>
+      <Modal size="lg" opened={opened} onClose={close} title="New Worker">
+        <PeopleForm onAddPerson={handleAddPerson} />
+      </Modal>
 
-    <Button onClick={open} variant="outline" size="md" radius="lg">Add New Worker</Button>
+      <Button onClick={open} variant="outline" size="md" radius="lg">
+        Add New Worker
+      </Button>
 
-    <Space h='md'/>
+      <Space h="md" />
 
-    <div className="worker-table">
-      <Table
-        stickyHeader
-        stickyHeaderOffset={60}
-        striped
-        highlightOnHover
-        withTableBorder
-        withColumnBorders
-      >
-        <Table.Thead>{ths}</Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
-      </Table>
-    </div>
+      <div className="worker-table">
+        <Table
+          stickyHeader
+          stickyHeaderOffset={60}
+          striped
+          highlightOnHover
+          withTableBorder
+          withColumnBorders
+        >
+          <Table.Thead>{ths}</Table.Thead>
+          <Table.Tbody>{rows}</Table.Tbody>
+        </Table>
+      </div>
     </>
   );
 };
