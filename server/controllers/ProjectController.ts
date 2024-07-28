@@ -31,20 +31,23 @@ export const allProjects = async (req: Request, res: Response) => {
 
 export const removeProject = async (req: Request, res: Response) => {
   try {
-    const projectName = req.body.projectName;
-    await deleteProject(projectName);
-    res.status(201).send(`${projectName} removed!`);
+    const projectId = req.params.projectId
+    await deleteProject(parseInt(projectId));
+    res.status(201).send(`${projectId} removed!`);
   } catch (error) {
     res.status(400).send(error);
   }
 };
 
-export const insertDetailProject = async (req: Request, res: Response) => {
+export const updateProject = async (req: Request, res: Response) => {
   try {
+    const projectId = req.body.projectId
     const projectName = req.body.projectName;
     const projectDetail = req.body.projectDetail;
-   // editProject()
-    res.status(202).send(`${projectDetail} added to ${projectName}!`);
+    const projectPriority = req.body.projectPriority
+    const projectStart = new Date(req.body.projectStart)
+    editProject(projectId,projectName,projectStart,projectPriority,projectDetail)
+    res.status(202).send(`${projectName} updated!`);
   } catch (error) {
     res.status(400).send(error);
   }
@@ -52,9 +55,8 @@ export const insertDetailProject = async (req: Request, res: Response) => {
 
 export const findProject = async (req: Request, res: Response) => {
   try {
-    console.log('yes')
-    const projectName = req.body.projectName
-    const project = await getInfoProject(projectName)
+    const projectId = req.params.projectId
+    const project = await getInfoProject(parseInt(projectId))
     res.status(200).send(project)
   } catch (error) {
     res.status(400).send(error)

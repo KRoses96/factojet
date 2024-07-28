@@ -47,6 +47,7 @@ type WeekAvaliability = {
 };
 
 type People = {
+  id: number;
   name: string;
   skills: string[];
   weekAvaliability: WeekAvaliability;
@@ -57,11 +58,19 @@ export const PeopleTable = () => {
 
   const [people, setPeople] = useState<People[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
+  const [selectedPerson, setSelectedPerson] = useState<number | null>(null);
 
   const handleAddPerson = () => {
     getAllPeole();
     close();
+    setSelectedPerson(null)
   };
+
+  const handleRowClick = (personId: number) => {
+    setSelectedPerson(personId);
+    open();
+  };
+
 
   const getAllPeole = () => {
     const url = 'http://localhost:3000/avaliability';
@@ -74,6 +83,7 @@ export const PeopleTable = () => {
       .then((data) =>
         setPeople(
           data.map((person: RespAvaliability) => ({
+            id: person.person.id,
             name: person.person.name,
             skills: person.person.skills.map((skill) => skill.name),
             weekAvaliability: {
@@ -109,8 +119,10 @@ export const PeopleTable = () => {
     </Table.Tr>
   );
 
+  
+
   const rows = people.map((person) => (
-    <Table.Tr key={person.name}>
+    <Table.Tr onClick={() => handleRowClick(person.id)} key={person.name}>
       <Table.Td>{person.name}</Table.Td>
       <Table.Td>
         {person.skills.map((skill) => (

@@ -15,35 +15,79 @@ type FormProject = {
 type ProjectFormProps = {
   onAddProject: () => void;
   editProject: boolean;
-  projectName: string;
+  projectId: number;
 };
 
-export const ProjectForm = ({ onAddProject, editProject, projectName }: ProjectFormProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+type ResponseProject = {
+  id: string;
+  name: string;
+  start_date: Date;
+  details: string;
+  priority: number;
+};
+
+export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFormProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [submittedValues, setSubmittedValues] = useState<FormProject | null>(null);
-  const url = 'http://localhost:3000/project' //Endpoint for all project related changes
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const url = 'http://localhost:3000/project'; //Endpoint for all project related changes
+
+
+
+  const [projectData, setProjectData] = useState<FormProject>({
+    name: '',
+    details: '',
+    start: new Date(),
+    priority: 50,
+  });
 
   const getProject = () => {
-    fetch(url + '/single',{
-      body: JSON.stringify({
-        projectName: projectName,
-      }),
-      headers: { 'Content-Type': 'application/json' },})
-  }
+    return fetch(url + `/${projectId}`, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then((project: ResponseProject) => {
+        console.log(project)
+        setProjectData({
+          name: project.name,
+          details: project.details,
+          start: new Date(project.start_date),
+          priority: project.priority,
+        });
+        setSelectedDate(new Date(project.start_date));
+        console.log(projectData)
+      });
+  };
+
+  useEffect(() => {
+    if (editProject && projectId) {
+      setIsLoading(true);
+      getProject().then(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
+    }
+  }, [editProject, projectId]);
 
   const form = useForm<FormProject>({
-    initialValues: {
-      name: '',
-      details: '',
-      start: new Date(),
-      priority: 50,
-    },
+    initialValues: projectData,
     validate: {
       name: isNotEmpty('Projects must have a name'),
       details: isNotEmpty('Projects must have details'),
       start: isNotEmpty('Projects must have a start date'),
     },
   });
+
+  useEffect(() => {
+    if (projectData.name !== undefined && projectData.details !== undefined && 
+        projectData.start !== undefined && projectData.priority !== undefined) {
+      form.setValues(projectData);
+    }
+  }, [projectData]);
+
+  useEffect(() => {
+    setSelectedDate(projectData.start);
+  }, [projectData.start]);
 
   const prioMarks = [
     { value: 0, label: 'Ignore' },
@@ -53,25 +97,23 @@ export const ProjectForm = ({ onAddProject, editProject, projectName }: ProjectF
     { value: 100, label: 'Urgent' },
   ];
 
-  //Used to transform the values from marks into proper db values
-  const prioRealValues = {
-    0: 1,
-    25: 2,
-    50: 3,
-    75: 4,
-    100: 5,
-  };
+  const handleDelete = () => {
+    fetch( url + `/${projectId}`, {
+      method: 'DELETE',
+    }).then(() => onAddProject())
+  }
 
   const handleSubmit = (values: FormProject) => {
     const projectData = {
       ...values,
-      start: selectedDate || new Date(),
+      start: selectedDate,
     };
     setSubmittedValues(projectData);
     const methodRequest = editProject ? 'PUT' : 'POST';
-    fetch(url ,{
+    fetch(url, {
       method: methodRequest,
       body: JSON.stringify({
+        projectId: projectId,
         projectName: projectData.name,
         projectStart: projectData.start,
         projectPriority: projectData.priority,
@@ -81,6 +123,10 @@ export const ProjectForm = ({ onAddProject, editProject, projectName }: ProjectF
     }).then(() => onAddProject());
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
       <TextInput {...form.getInputProps('name')} label="Name" placeholder="Name" />
@@ -88,6 +134,7 @@ export const ProjectForm = ({ onAddProject, editProject, projectName }: ProjectF
       <Textarea
         {...form.getInputProps('details')}
         label="Details"
+        autosize
         description="Project details"
         placeholder="Input project details"
       />
@@ -107,17 +154,18 @@ export const ProjectForm = ({ onAddProject, editProject, projectName }: ProjectF
         <DatePicker
           {...form.getInputProps('start')}
           value={selectedDate}
-          onChange={setSelectedDate}
+          onChange={(date) => setSelectedDate(date || new Date())}
         />
       </Flex>
+      <Space h='md'/>
       <Flex mih={50} gap="md" justify="center" align="center" direction="row" wrap="wrap">
         <Button type="submit" mt="md">
-          Submit
+          {editProject? (<>Save</>) : (<>Create New Project</>)}
         </Button>
         {editProject ? (
           <>
-            <Button color="red" mt="md">
-              Delete Project
+            <Button type='submit' onClick={handleDelete} color="red" mt="md">
+              Delete
             </Button>
           </>
         ) : null}

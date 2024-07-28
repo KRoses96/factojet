@@ -33,6 +33,7 @@ type Task = {
 };
 
 type Project = {
+  id: number;
   name: string;
   detail: string;
   tasks: Task[];
@@ -49,7 +50,7 @@ const colorOptions = { saturation: 50, lightness: 55, alpha: 80 };
 
 export const ProjectCard = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [editProject, setEditProject] = useState<string>('')
+  const [editProject, setEditProject] = useState<number>(0)
   const [openedNP, { open: openNP, close: closeNP }] = useDisclosure(false);
   const [openedTM, { open: openTM, close: closeTM }] = useDisclosure(false);
   const [openedEP, { open: openEP, close: closeEP }] = useDisclosure(false);
@@ -60,8 +61,8 @@ export const ProjectCard = () => {
     closeEP();
   };
 
-  const handleEditProject = (projectName : string) => {
-    setEditProject(projectName)
+  const handleEditProject = (projectId : number) => {
+    setEditProject(projectId)
     openEP()
   }
 
@@ -106,6 +107,7 @@ export const ProjectCard = () => {
             }
 
             return {
+              id: project.id,
               name: project.name,
               detail: project.details,
               tasks: project.tasks.map((task) => task.name),
@@ -220,7 +222,7 @@ export const ProjectCard = () => {
         <Button onClick={openTM} variant="outline" size="md" radius="lg">
           Task Manager
         </Button>
-        <Button onClick={() => handleEditProject(project.name)} variant="outline" size="md" radius="lg">
+        <Button onClick={() => handleEditProject(project.id)} variant="outline" size="md" radius="lg">
           Edit Project
         </Button>
       </Flex>
@@ -239,7 +241,7 @@ export const ProjectCard = () => {
   return (
     <>
       <Modal size="lg" opened={openedNP} onClose={closeNP} title="New Project">
-        <ProjectForm projectName = {''} onAddProject={handleAddProject} editProject={false} />
+        <ProjectForm projectId = {0} onAddProject={handleAddProject} editProject={false} />
       </Modal>
 
       <Modal size="lg" opened={openedTM} onClose={closeTM} title="Task Manager">
@@ -247,7 +249,7 @@ export const ProjectCard = () => {
       </Modal>
 
       <Modal size="lg"  opened={openedEP} onClose={closeEP} title="Edit Project">
-        <ProjectForm projectName = {editProject} onAddProject={handleAddProject} editProject={true} />
+        <ProjectForm projectId = {editProject} onAddProject={handleAddProject} editProject={true} />
       </Modal>
 
       <div>

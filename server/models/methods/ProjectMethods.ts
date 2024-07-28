@@ -19,25 +19,25 @@ export const getProjects = async () => {
     relations: ["tasks", "tasks.skills"]})
 };
 
-export const deleteProject = async (name: string) => {
+export const deleteProject = async (id: number) => {
   await AppDataSource.createQueryBuilder()
     .delete()
     .from(Project)
-    .where("name = :name", { name: name })
+    .where("id = :id", { id: id })
     .execute();
 };
 
-export const editProject = async (projectName: string, detail: string) => {
+export const editProject = async (projectId: number,projectName: string, start: Date, priority: number ,projectDetail: string) => {
   await AppDataSource.createQueryBuilder()
     .update(Project)
-    .set({ detail: detail })
-    .where("name = :name", { name: projectName })
+    .set({ details: projectDetail, name: projectName,start_date: start, priority: priority })
+    .where("id = :id", { id: projectId })
     .execute();
 };
 
-export const getInfoProject = async(projectName: string) => {
-  const project = await AppDataSource.getRepository(Project).find({where : {
-    name: projectName
-  }})  
+export const getInfoProject = async(projectId: number) => {
+  const project = await AppDataSource.getRepository(Project).findOne({where : {
+    id: projectId
+  }})
   return project
 }

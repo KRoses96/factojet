@@ -37,6 +37,7 @@ export const PeopleForm = ({ onAddPerson }: PeopleFormProps) => {
   });
 
   const [submittedValues, setSubmittedValues] = useState<FormPerson | null>(null);
+  
 
   const typeSchedules = {
     fullTime: [8, 18],
