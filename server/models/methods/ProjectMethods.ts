@@ -38,6 +38,6 @@ export const editProject = async (projectId: number,projectName: string, start: 
 export const getInfoProject = async(projectId: number) => {
   const project = await AppDataSource.getRepository(Project).findOne({where : {
     id: projectId
-  }})
+  }, relations: ["tasks", "tasks.required" ,"tasks.skills"]})
   return project
 }

@@ -9,7 +9,7 @@ import '@mantine/charts/styles.css';
 
 import { TaskManager } from '../TaskManager/TaskManager';
 
-type RespProject = {
+export type RespProject = {
   id: number;
   name: string;
   details: string | null;
@@ -260,15 +260,15 @@ export const ProjectCard = () => {
 
   return (
     <>
-      <Modal size="lg" opened={openedNP} onClose={closeNP} title="New Project">
+      <Modal size="50%" opened={openedNP} onClose={closeNP} title="New Project">
         <ProjectForm projectId={0} onAddProject={handleAddProject} editProject={false} />
       </Modal>
 
-      <Modal size="lg" opened={openedEP} onClose={closeEP} title="Edit Project">
+      <Modal size="50%" opened={openedEP} onClose={closeEP} title="Edit Project">
         <ProjectForm projectId={editProject} onAddProject={handleAddProject} editProject={true} />
       </Modal>
 
-      <Modal size="xl" opened={openedTM} onClose={closeTM} title="Task Manager">
+      <Modal size="100%" opened={openedTM} onClose={closeTM} title="Task Manager">
         <TaskManager projectId={editProject} />
       </Modal>
 

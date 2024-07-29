@@ -73,7 +73,6 @@ const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
 
   const processWorkedTimeData = useCallback(() => {
     const workedTime: { [key: string]: number } = {};
-
     myEvents.forEach((event: MbscCalendarEvent) => {
       if (
         event.resource &&

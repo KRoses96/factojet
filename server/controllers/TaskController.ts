@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { addTask, deleteTask, getTasks } from "../models/methods/TaskMethods";
+import { addTask, deleteTask, getTask, getTasks } from "../models/methods/TaskMethods";
 
 export const insertTask = async (req: Request, res: Response) => {
   try {
@@ -17,9 +17,9 @@ export const insertTask = async (req: Request, res: Response) => {
 
 export const removeTask = async (req: Request, res: Response) => {
   try {
-    const taskName = req.body.taskName;
-    await deleteTask(taskName);
-    res.status(201).send(`${taskName} removed!`);
+    const taskId = req.body.taskId;
+    await deleteTask(taskId);
+    res.status(201).send(`${taskId} removed!`);
   } catch (error) {
     res.status(400).send(error);
   }
@@ -29,6 +29,16 @@ export const removeTask = async (req: Request, res: Response) => {
 export const allTasks = async (req: Request, res: Response) => {
   try {
     const tasks = await getTasks();
+    res.status(200).send(tasks);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+export const infoTask = async (req: Request, res: Response) => {
+  try {
+    const taskId = req.params.taskId
+    const tasks = await getTask(parseInt(taskId));
     res.status(200).send(tasks);
   } catch (error) {
     res.status(400).send(error);

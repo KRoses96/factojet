@@ -64,15 +64,22 @@ export const addTask = async (
 }
 };
 
-export const deleteTask = async (name: string) => {
+export const deleteTask = async (id: number) => {
   await AppDataSource.createQueryBuilder()
     .delete()
     .from(Task)
-    .where("name = :name", { name: name })
+    .where("id = :id", { id: id })
     .execute();
 };
 
 
 export const getTasks = async () => {
-  return AppDataSource.manager.find(Task);
+  return AppDataSource.getRepository(Task)
+  .find({ relations: { skills: true } });;
 };
+
+export const getTask = async (taskId: number) => {
+  return AppDataSource.getRepository(Task).findOne({where : {
+    id: taskId
+  }, relations: ["required" ,"skills"]})
+}

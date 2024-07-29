@@ -34,6 +34,7 @@ export type RespAvaliability = {
 };
 
 type Skill = {
+  id:number;
   name: string;
 };
 
@@ -107,7 +108,7 @@ export const PeopleTable = () => {
 
   useEffect(() => {
     try{
-    setInterval(getAllPeole,30);4
+    setInterval(getAllPeole,30);
     } catch (err) {
       console.log('failed to update')
     }
@@ -130,7 +131,7 @@ export const PeopleTable = () => {
   
 
   const rows = people.map((person) => (
-    <Table.Tr onClick={() => handleRowClick(person.id)} key={person.name}>
+    <Table.Tr onClick={() => handleRowClick(person.id)} key={person.id}>
       <Table.Td>{person.name}</Table.Td>
       <Table.Td>
         {person.skills.map((skill) => (
@@ -196,7 +197,7 @@ export const PeopleTable = () => {
 
   return (
     <>
-      <Modal size="lg"  opened={opened} onClose={handleCloseModal} title="New Worker">
+      <Modal size="lg"  opened={opened} onClose={handleCloseModal} title={selectedPerson? 'Edit Worker' : 'New Worker'}>
         <PeopleForm selectedPerson = {selectedPerson} onAddPerson={handleAddPerson} />
       </Modal>
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button, Text, TextInput, TagsInput, Space, Radio, Group } from '@mantine/core';
-import { hasLength, useForm } from '@mantine/form';
+import { hasLength, isNotEmpty, useForm } from '@mantine/form';
 import { RespAvaliability } from '../PeopleTable/PeopleTable';
 
 type FormPerson = {
@@ -40,7 +40,7 @@ export const PeopleForm = ({ onAddPerson, selectedPerson }: PeopleFormProps) => 
   const form = useForm({
     initialValues: personData,
     validate: {
-      name: hasLength({ min: 3 }, 'Must be at least 3 characters'),
+      name: isNotEmpty('Workers must have a name')
     },
   });
 
@@ -83,7 +83,6 @@ export const PeopleForm = ({ onAddPerson, selectedPerson }: PeopleFormProps) => 
         })
         .catch((error) => {
           console.error('Error fetching person data:', error);
-          // You might want to set an error state here and display it to the user
         })
         .finally(() => setIsLoading(false));
     }
@@ -95,7 +94,6 @@ export const PeopleForm = ({ onAddPerson, selectedPerson }: PeopleFormProps) => 
 
   const handleSubmit = (values: FormPerson) => {
     setSubmittedValues(values);
-    const url = 'http://localhost:3000/people';
     const methodRequest = selectedPerson? 'PUT' : 'POST'
     fetch(url, {
       method: methodRequest,
