@@ -269,7 +269,7 @@ export const ProjectCard = () => {
       </Modal>
 
       <Modal size="100%" opened={openedTM} onClose={closeTM} title="Task Manager">
-        <TaskManager projectId={editProject} />
+        <TaskManager projectId={editProject} onAddProject = {handleAddProject} />
       </Modal>
 
       <div>

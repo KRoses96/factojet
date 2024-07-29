@@ -19,6 +19,6 @@ export class Project {
   @Column()
   priority: number
 
-  @OneToMany(() => Task, (task) => task.project)
+  @OneToMany(() => Task, (task) => task.project, {cascade:true, onDelete: 'CASCADE'})
   tasks: Task[];
 }

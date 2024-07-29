@@ -107,14 +107,16 @@ export const TaskForm = ({ onAddTask, selectedTask, projectId }: TaskFormProps) 
   const handleSubmit = (values: FormTask) => {
     const methodRequest = selectedTask ? 'PUT' : 'POST';
     const body = {
+      projectId : projectId,
       taskId: selectedTask,
       taskName: values.name,
       time: values.time,
       skills: selectedSkills,
       required: selectedRequiredTasks.map((task) => task.id),
     };
-
-    fetch(url, {
+    console.log(body)
+    
+    fetch(url + 'task', {
       method: methodRequest,
       body: JSON.stringify(body),
       headers: { 'Content-Type': 'application/json' },

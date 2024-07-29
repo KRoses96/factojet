@@ -19,7 +19,7 @@ export type Task = {
   required: Task[];
 };
 
-export const TaskManager = ({ projectId }: { projectId: number }) => {
+export const TaskManager = ({ projectId , onAddProject }: { projectId: number, onAddProject: () => void; }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedTask, setSelectedTask] = useState<number | null>(0)
@@ -29,6 +29,7 @@ export const TaskManager = ({ projectId }: { projectId: number }) => {
   const handleAddTask = () => {
     getAllTasks();
     handleCloseModal()
+    onAddProject()
   };
 
   const handleRowClick = (taskId: number) => {

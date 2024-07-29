@@ -6,62 +6,54 @@ import { Skill } from "../src/entity/Skill";
 export const addTask = async (
   taskName: string,
   timeHours: number,
-  project: string,
-  skills: string,
-  required: string,
+  projectId: number,
+  skills: string[],
+  required: number[],
   completed: boolean
 ) => {
-  const projectId = await AppDataSource.manager
-    .findOneBy(Project, {
-      name: project,
-    })
-    .then((projectFound) => (projectFound ? projectFound.id : null));
-
-  if (projectId) {
-    await AppDataSource.createQueryBuilder()
-      .insert()
-      .into(Task)
-      .values({
-        name: taskName,
-        time: timeHours,
-        project: { id: projectId },
-        complete: completed
-      })
-      .execute();
-
-    const task = await AppDataSource.manager.findOneBy(Task, {
+  await AppDataSource.createQueryBuilder()
+    .insert()
+    .into(Task)
+    .values({
       name: taskName,
-    });
+      time: timeHours,
+      project: { id: projectId },
+      complete: false,
+    })
+    .execute();
 
-    const skillArr = skills.split(",");
-    for (let skill of skillArr) {
-      const skillId = await AppDataSource.manager
-        .findOneBy(Skill, {
-          name: skill,
-        })
-        .then((skillFound) => (skillFound ? skillFound.id : null));
-      if(skillId) {
+  const task = await AppDataSource.manager.findOneBy(Task, {
+    name: taskName,
+  });
+
+  for (let skill of skills) {
+    const skillId = await AppDataSource.manager
+      .findOneBy(Skill, {
+        name: skill,
+      })
+      .then((skillFound) => (skillFound ? skillFound.id : null));
+    if (skillId) {
       await AppDataSource.createQueryBuilder()
         .relation(Task, "skills")
         .of(task)
         .add(skillId);
-      }
-    }
-    
-    if(required) {
-    const requiredArr = required.split(",");
-    for (let taskToComplete of requiredArr) {
-      const taskToCompleteId = await AppDataSource.manager.findOneBy(Task, {
-        name: taskToComplete
-      }).then((taskFound) => taskFound? taskFound.id : null)
-
-      await AppDataSource.createQueryBuilder()
-      .relation(Task, "required")
-      .of(task)
-      .add(taskToCompleteId)
     }
   }
-}
+
+  if (required) {
+    for (let taskToComplete of required) {
+      const taskToCompleteId = await AppDataSource.manager
+        .findOneBy(Task, {
+          id: taskToComplete,
+        })
+        .then((taskFound) => (taskFound ? taskFound.id : null));
+
+      await AppDataSource.createQueryBuilder()
+        .relation(Task, "required")
+        .of(task)
+        .add(taskToCompleteId);
+    }
+  }
 };
 
 export const deleteTask = async (id: number) => {
@@ -72,14 +64,76 @@ export const deleteTask = async (id: number) => {
     .execute();
 };
 
+export const updateTask = async (
+  projectId: number,
+  taskId: number,
+  taskName: string,
+  time: number,
+  skills: string[],
+  required: number[]
+) => {
+  await AppDataSource.createQueryBuilder()
+    .update(Task)
+    .set({
+      name: taskName,
+      time: time,
+      project: { id: projectId }
+    })
+    .where("id = :id", { id: taskId })
+    .execute();
+
+  const task = await AppDataSource.manager.findOne(Task, {
+    where: { id: taskId },
+    relations: ["skills", "required"]
+  });
+
+  if (!task) {
+    throw new Error("Task not found");
+  }
+
+  await AppDataSource.createQueryBuilder()
+    .relation(Task, "skills")
+    .of(task)
+    .remove(task.skills);
+
+  // Add new skills
+  for (let skillName of skills) {
+    const skill = await AppDataSource.manager.findOne(Skill, {
+      where: { name: skillName }
+    });
+
+    if (skill) {
+      await AppDataSource.createQueryBuilder()
+        .relation(Task, "skills")
+        .of(task)
+        .add(skill.id);
+    }
+  }
+
+  await AppDataSource.createQueryBuilder()
+    .relation(Task, "required")
+    .of(task)
+    .remove(task.required);
+
+  for (let requiredTaskId of required) {
+    await AppDataSource.createQueryBuilder()
+      .relation(Task, "required")
+      .of(task)
+      .add(requiredTaskId);
+  }
+};
 
 export const getTasks = async () => {
-  return AppDataSource.getRepository(Task)
-  .find({ relations: { skills: true } });;
+  return AppDataSource.getRepository(Task).find({
+    relations: { skills: true },
+  });
 };
 
 export const getTask = async (taskId: number) => {
-  return AppDataSource.getRepository(Task).findOne({where : {
-    id: taskId
-  }, relations: ["required" ,"skills"]})
-}
+  return AppDataSource.getRepository(Task).findOne({
+    where: {
+      id: taskId,
+    },
+    relations: ["required", "skills"],
+  });
+};
