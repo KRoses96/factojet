@@ -5,6 +5,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { PeopleForm } from '../PeopleForm/PeopleForm';
 import { generateColorRGB } from '@marko19907/string-to-color';
 
+
 const colorOptions = { saturation: 50, lightness: 55, alpha: 80 };
 
 export type Person = {
@@ -105,7 +106,11 @@ export const PeopleTable = () => {
   };
 
   useEffect(() => {
-    getAllPeole();
+    try{
+    setInterval(getAllPeole,30);4
+    } catch (err) {
+      console.log('failed to update')
+    }
   }, []);
 
   const ths = (

@@ -48,246 +48,204 @@ export const solutionFinder = async (req: Request, res: Response) => {
     .getRepository(Task)
     .find({ relations: { required: true, skills: true, project: true } });
 
-
-  if (!people.length || !peopleAvaliabilities.length || !projects.length || !tasks.length ) res.status(400).send('No Data')
+  if (
+    !people.length ||
+    !peopleAvaliabilities.length ||
+    !projects.length ||
+    !tasks.length
+  )
+    res.status(400).send("No Data");
   else {
-  //Check all Skills within the factory
-  const getTeamSkills = (): string[] => {
-    const skills: string[] = [];
-    for (let person of people) {
-      for (let skill of person.skills) {
-        if (!skills.includes(skill.name)) {
-          skills.push(skill.name);
+    //Check all Skills within the factory
+    const getTeamSkills = (): string[] => {
+      const skills: string[] = [];
+      for (let person of people) {
+        for (let skill of person.skills) {
+          if (!skills.includes(skill.name)) {
+            skills.push(skill.name);
+          }
         }
       }
-    }
-    return skills;
-  };
-  const teamSkills = getTeamSkills();
+      return skills;
+    };
+    const teamSkills = getTeamSkills();
 
-  //Get all the possible tasks
-  const getPossibleTasks = (): PossibleTask[] => {
-    const possibleTasks: PossibleTask[] = [];
-    let possible;
-    for (let task of tasks) {
-      possible = 1;
-      for (let skill of task.skills) {
-        if (!teamSkills.includes(skill.name)) {
-          possible = 0;
+    //Get all the possible tasks
+    const getPossibleTasks = (): PossibleTask[] => {
+      const possibleTasks: PossibleTask[] = [];
+      let possible;
+      for (let task of tasks) {
+        possible = 1;
+        for (let skill of task.skills) {
+          if (!teamSkills.includes(skill.name)) {
+            possible = 0;
+          }
         }
+        if (possible)
+          possibleTasks.push({
+            name: task.name,
+            time: task.time,
+            project: task.project.name,
+            reqSkills: task.skills.map((skill) => skill.name),
+            reqTasks: task.required.map((task) => task.name),
+            startDate: task.project.start_date,
+            prio: task.project.priority,
+          });
       }
-      if (possible)
-        possibleTasks.push({
-          name: task.name,
-          time: task.time,
-          project: task.project.name,
-          reqSkills: task.skills.map((skill) => skill.name),
-          reqTasks: task.required.map((task) => task.name),
-          startDate: task.project.start_date,
-          prio: task.project.priority,
+      return possibleTasks;
+    };
+
+    const possibleTasks = getPossibleTasks();
+    const sortedPossibleTasks = possibleTasks.sort((a, b) => b.prio - a.prio);
+
+    let startTime = projects.reduce((acc, project) =>
+      project.start_date.getTime() < acc.start_date.getTime() ? project : acc
+    ).start_date;
+
+    const avaliablePeople = (time: number) => {
+      const currentDate = new Date(time);
+      const currentWeekDay = currentDate.getDay();
+      const currentHour = currentDate.getHours();
+      let avaliable;
+      switch (currentWeekDay) {
+        case 0:
+          avaliable = peopleAvaliabilities.filter(
+            (person) =>
+              person.sunday_start <= currentHour &&
+              currentHour < person.sunday_end
+          );
+          break;
+        case 1:
+          avaliable = peopleAvaliabilities.filter(
+            (person) =>
+              person.monday_start < currentHour &&
+              currentHour < person.monday_end
+          );
+          break;
+        case 2:
+          avaliable = peopleAvaliabilities.filter(
+            (person) =>
+              person.tuesday_start < currentHour &&
+              currentHour < person.tuesday_end
+          );
+          break;
+        case 3:
+          avaliable = peopleAvaliabilities.filter(
+            (person) =>
+              person.wednesday_start < currentHour &&
+              currentHour < person.wednesday_end
+          );
+          break;
+        case 4:
+          avaliable = peopleAvaliabilities.filter(
+            (person) =>
+              person.thursday_start < currentHour &&
+              currentHour < person.thursday_end
+          );
+          break;
+        case 5:
+          avaliable = peopleAvaliabilities.filter(
+            (person) =>
+              person.friday_start < currentHour &&
+              currentHour < person.friday_end
+          );
+          break;
+        case 6:
+          avaliable = peopleAvaliabilities.filter(
+            (person) =>
+              person.saturday_start < currentHour &&
+              currentHour < person.saturday_end
+          );
+          break;
+      }
+      if (avaliable && avaliable.length) {
+        const avaliablePeople: AvaliablePeople[] = [];
+        avaliable.forEach((person) => {
+          avaliablePeople.push({
+            name: person.person.id,
+            skills: person.person.skills.map((skill) => skill.name),
+            importance: person.person.skills.length,
+          });
         });
-    }
-    return possibleTasks;
-  };
 
-  const possibleTasks = getPossibleTasks();
-  const sortedPossibleTasks = sortByPrio(possibleTasks);
+        return avaliablePeople.sort((a, b) => a.importance - b.importance);
+      }
+    };
 
-  let startTime = projects.reduce((acc, project) =>
-    project.start_date.getTime() < acc.start_date.getTime() ? project : acc
-  ).start_date;
+    let nextTime = startTime.getTime();
+    const completedTasks: Set<string> = new Set();
+    const ongoingTasks: { [personName: string]: number } = {}; // Track end time of ongoing tasks for each person
 
-  const avaliablePeople = (time: number) => {
-    const currentDate = new Date(time);
-    const currentWeekDay = currentDate.getDay();
-    const currentHour = currentDate.getHours();
-    let avaliable;
-    switch (currentWeekDay) {
-      case 0:
-        avaliable = peopleAvaliabilities.filter(
-          (person) =>
-            person.sunday_start <= currentHour &&
-            currentHour < person.sunday_end
-        );
-        break;
-      case 1:
-        avaliable = peopleAvaliabilities.filter(
-          (person) =>
-            person.monday_start < currentHour && currentHour < person.monday_end
-        );
-        break;
-      case 2:
-        avaliable = peopleAvaliabilities.filter(
-          (person) =>
-            person.tuesday_start < currentHour &&
-            currentHour < person.tuesday_end
-        );
-        break;
-      case 3:
-        avaliable = peopleAvaliabilities.filter(
-          (person) =>
-            person.wednesday_start < currentHour &&
-            currentHour < person.wednesday_end
-        );
-        break;
-      case 4:
-        avaliable = peopleAvaliabilities.filter(
-          (person) =>
-            person.thursday_start < currentHour &&
-            currentHour < person.thursday_end
-        );
-        break;
-      case 5:
-        avaliable = peopleAvaliabilities.filter(
-          (person) =>
-            person.friday_start < currentHour && currentHour < person.friday_end
-        );
-        break;
-      case 6:
-        avaliable = peopleAvaliabilities.filter(
-          (person) =>
-            person.saturday_start < currentHour &&
-            currentHour < person.saturday_end
-        );
-        break;
-    }
-    if (avaliable && avaliable.length) {
-      const avaliablePeople: AvaliablePeople[] = [];
-      avaliable.forEach((person) => {
-        avaliablePeople.push({
-          name: person.person.id,
-          skills: person.person.skills.map((skill) => skill.name),
-          importance: person.person.skills.length,
-        });
-      });
+    let lastTaskMap: { [key: string]: ScheduledTask } = {};
 
-      return sortByImportance(avaliablePeople);
-    }
-  };
+    const MAX_ITERATIONS = 10000; //Adding some extra logic will allow you to remove max iterations
+    let iterations = 0; //Keeping max iterations while working on the proff of concept
+    while (sortedPossibleTasks.length > 0 && iterations < MAX_ITERATIONS) {
+      let peopleAvaliable = avaliablePeople(nextTime);
 
-  let nextTime = startTime.getTime();
-  const completedTasks: Set<string> = new Set();
-  const ongoingTasks: { [personName: string]: number } = {}; // Track end time of ongoing tasks for each person
+      ++iterations;
 
-  let lastTaskMap: { [key: string]: ScheduledTask } = {};
+      if (peopleAvaliable) {
+        sortedPossibleTasks.forEach((task, index) => {
+          const prerequisitesCompleted = task.reqTasks.every((reqTask) =>
+            completedTasks.has(reqTask)
+          );
 
-  while (sortedPossibleTasks.length > 0) {
-    let peopleAvaliable = avaliablePeople(nextTime);
+          if (
+            prerequisitesCompleted &&
+            new Date(task.startDate).getTime() <= nextTime
+          ) {
+            let person: AvaliablePeople | undefined;
+            let canDo = false;
 
-    if (peopleAvaliable) {
-      sortedPossibleTasks.forEach((task, index) => {
-        const prerequisitesCompleted = task.reqTasks.every((reqTask) =>
-          completedTasks.has(reqTask)
-        );
+            for (let p of peopleAvaliable) {
+              if (!ongoingTasks[p.name] || ongoingTasks[p.name] <= nextTime) {
+                canDo = task.reqSkills.every((skill) =>
+                  p.skills.includes(skill)
+                );
+                if (canDo) {
+                  person = p;
+                  break;
+                }
+              }
+            }
 
-        if (
-          prerequisitesCompleted &&
-          new Date(task.startDate).getTime() <= nextTime
-        ) {
-          let person: AvaliablePeople | undefined;
-          let canDo = false;
+            if (person) {
+              const personKey = `${person.name}-${task.project}-${task.name}`;
+              const lastTask = lastTaskMap[personKey];
 
-          for (let p of peopleAvaliable) {
-            if (!ongoingTasks[p.name] || ongoingTasks[p.name] <= nextTime) {
-              canDo = task.reqSkills.every((skill) => p.skills.includes(skill));
-              if (canDo) {
-                person = p;
-                break;
+              if (lastTask && lastTask.end.getTime() === nextTime) {
+                lastTask.end = new Date(nextTime + 3600000);
+              } else {
+                const scheduledTask: ScheduledTask = {
+                  start: new Date(nextTime),
+                  end: new Date(nextTime + 3600000),
+                  title: task.project + " - " + task.name,
+                  resource: person.name,
+                  project: task.project,
+                };
+
+                schedule.push(scheduledTask);
+                lastTaskMap[personKey] = scheduledTask;
+              }
+
+              ongoingTasks[person.name] = nextTime + 3600000;
+
+              task.time -= 1;
+
+              if (task.time <= 0) {
+                completedTasks.add(task.name);
+                sortedPossibleTasks.splice(index, 1);
+                delete ongoingTasks[person.name];
               }
             }
           }
+        });
+      }
 
-          if (person) {
-            const personKey = `${person.name}-${task.project}-${task.name}`;
-            const lastTask = lastTaskMap[personKey];
-
-            if (lastTask && lastTask.end.getTime() === nextTime) {
-              lastTask.end = new Date(nextTime + 3600000);
-            } else {
-              const scheduledTask: ScheduledTask = {
-                start: new Date(nextTime),
-                end: new Date(nextTime + 3600000),
-                title: task.project + ' - ' + task.name,
-                resource: person.name,
-                project: task.project,
-              };
-
-              schedule.push(scheduledTask);
-              lastTaskMap[personKey] = scheduledTask;
-            }
-
-            ongoingTasks[person.name] = nextTime + 3600000;
-
-            task.time -= 1;
-
-            if (task.time <= 0) {
-              completedTasks.add(task.name);
-              sortedPossibleTasks.splice(index, 1);
-              delete ongoingTasks[person.name];
-            }
-          }
-        }
-      });
+      nextTime += 3600000; // Move to the next hour
     }
 
-    nextTime += 3600000; // Move to the next hour
+    res.status(200).json(schedule);
   }
-
-  res.status(200).json(schedule);
-}
-};
-
-//Prio Sort
-const sortByPrio = (tasks: PossibleTask[]): PossibleTask[] => {
-  const mergeSorty = (leftArr: PossibleTask[], rightArr: PossibleTask[]) => {
-    const sortedArr: PossibleTask[] = [];
-    while (leftArr.length && rightArr.length) {
-      if (leftArr[0].prio > rightArr[0].prio) {
-        sortedArr.push(leftArr[0]);
-        leftArr.shift();
-      } else {
-        sortedArr.push(rightArr[0]);
-        rightArr.shift();
-      }
-    }
-    return sortedArr.concat(leftArr).concat(rightArr);
-  };
-
-  if (tasks.length === 1) return tasks;
-
-  let halfArr = Math.floor(tasks.length / 2);
-
-  let left = sortByPrio(tasks.slice(0, halfArr));
-  let right = sortByPrio(tasks.slice(halfArr, tasks.length));
-
-  return mergeSorty(left, right);
-};
-
-//Importance Sort
-const sortByImportance = (avaliable: AvaliablePeople[]): AvaliablePeople[] => {
-  const mergeSorty = (
-    leftArr: AvaliablePeople[],
-    rightArr: AvaliablePeople[]
-  ) => {
-    const sortedArr: AvaliablePeople[] = [];
-    while (leftArr.length && rightArr.length) {
-      if (leftArr[0].importance > rightArr[0].importance) {
-        sortedArr.push(leftArr[0]);
-        leftArr.shift();
-      } else {
-        sortedArr.push(rightArr[0]);
-        rightArr.shift();
-      }
-    }
-    return sortedArr.concat(leftArr).concat(rightArr);
-  };
-
-  if (avaliable.length === 1) return avaliable;
-
-  let halfArr = Math.floor(avaliable.length / 2);
-
-  let left = sortByImportance(avaliable.slice(0, halfArr));
-  let right = sortByImportance(avaliable.slice(halfArr, avaliable.length));
-
-  return mergeSorty(left, right);
 };

@@ -14,6 +14,8 @@ import { FC, useEffect, useMemo, useState, ChangeEvent, useCallback } from 'reac
 import { generateColorRGB } from '@marko19907/string-to-color';
 import { Space, Divider, Title, Text, Flex, Table, ColorSwatch } from '@mantine/core';
 import { DonutChart } from '@mantine/charts';
+import '@mantine/charts/styles.css';
+
 const colorOptions = { saturation: 45, lightness: 55, alpha: 100 };
 
 setOptions({
@@ -44,7 +46,8 @@ type RespProject = {
   }[];
 };
 
-const ScheduleGroup: FC = () => {
+
+const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
   const [myEvents, setEvents] = useState<MbscCalendarEvent[]>([]);
   const [myResources, setResources] = useState<MbscResource[]>([]);
   const [activeResourceIds, setActiveResourceIds] = useState<Set<number>>(new Set());
@@ -97,7 +100,7 @@ const ScheduleGroup: FC = () => {
       color: generateColorRGB(name, colorOptions),
     }));
 
-    setWorkedTimeData(newWorkedTimeData);
+    setWorkedTimeData(newWorkedTimeData.sort((a,b) => b.value-a.value));
   }, [myEvents, myResources]);
 
   const filter = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
@@ -158,7 +161,7 @@ const ScheduleGroup: FC = () => {
       },
       'json'
     );
-  }, []);
+  }, [currentTab ]);
 
   return (
     <>
@@ -249,7 +252,6 @@ const ScheduleGroup: FC = () => {
             </Text>
             <DonutChart
               mx="auto"
-              withTooltip={false}
               h={300}
               w={300}
               size={230}

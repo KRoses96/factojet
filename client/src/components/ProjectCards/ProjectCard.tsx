@@ -5,6 +5,9 @@ import { generateColorRGB } from '@marko19907/string-to-color';
 import './ProjectCard.css';
 import { useDisclosure } from '@mantine/hooks';
 import { ProjectForm } from '../ProjectForm/ProjectForm';
+import '@mantine/charts/styles.css';
+
+import { TaskManager } from '../TaskManager/TaskManager';
 
 type RespProject = {
   id: number;
@@ -50,7 +53,7 @@ const colorOptions = { saturation: 50, lightness: 55, alpha: 80 };
 
 export const ProjectCard = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [editProject, setEditProject] = useState<number>(0)
+  const [editProject, setEditProject] = useState<number>(0);
   const [openedNP, { open: openNP, close: closeNP }] = useDisclosure(false);
   const [openedTM, { open: openTM, close: closeTM }] = useDisclosure(false);
   const [openedEP, { open: openEP, close: closeEP }] = useDisclosure(false);
@@ -61,10 +64,15 @@ export const ProjectCard = () => {
     closeEP();
   };
 
-  const handleEditProject = (projectId : number) => {
-    setEditProject(projectId)
-    openEP()
-  }
+  const handleEditProject = (projectId: number) => {
+    setEditProject(projectId);
+    openEP();
+  };
+
+  const handleTaskManager = (projectId: number) => {
+    setEditProject(projectId);
+    openTM();
+  };
 
   const prioText = {
     0: 'Ignore',
@@ -166,8 +174,8 @@ export const ProjectCard = () => {
                 Skillsets Necessary
               </Text>
               <DonutChart
+                tooltipDataSource="segment"
                 mx="auto"
-                withTooltip={false}
                 h={300}
                 w={300}
                 key={`chart-${project.name}`}
@@ -189,16 +197,18 @@ export const ProjectCard = () => {
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {project.skills.map((skill) => (
-                    <Table.Tr key={skill.name}>
-                      <Table.Td>
-                        {' '}
-                        <ColorSwatch color={generateColorRGB(skill.name, colorOptions)} />
-                      </Table.Td>
-                      <Table.Td>{skill.name}</Table.Td>
-                      <Table.Td>{skill.time}</Table.Td>
-                    </Table.Tr>
-                  ))}
+                  {project.skills
+                    .sort((a, b) => b.time - a.time)
+                    .map((skill) => (
+                      <Table.Tr key={skill.name}>
+                        <Table.Td>
+                          {' '}
+                          <ColorSwatch color={generateColorRGB(skill.name, colorOptions)} />
+                        </Table.Td>
+                        <Table.Td>{skill.name}</Table.Td>
+                        <Table.Td>{skill.time}</Table.Td>
+                      </Table.Tr>
+                    ))}
                 </Table.Tbody>
               </Table>
             </div>
@@ -219,10 +229,20 @@ export const ProjectCard = () => {
         wrap="wrap"
         className="card-buttons"
       >
-        <Button onClick={openTM} variant="outline" size="md" radius="lg">
+        <Button
+          onClick={() => handleTaskManager(project.id)}
+          variant="outline"
+          size="md"
+          radius="lg"
+        >
           Task Manager
         </Button>
-        <Button onClick={() => handleEditProject(project.id)} variant="outline" size="md" radius="lg">
+        <Button
+          onClick={() => handleEditProject(project.id)}
+          variant="outline"
+          size="md"
+          radius="lg"
+        >
           Edit Project
         </Button>
       </Flex>
@@ -241,15 +261,15 @@ export const ProjectCard = () => {
   return (
     <>
       <Modal size="lg" opened={openedNP} onClose={closeNP} title="New Project">
-        <ProjectForm projectId = {0} onAddProject={handleAddProject} editProject={false} />
+        <ProjectForm projectId={0} onAddProject={handleAddProject} editProject={false} />
       </Modal>
 
-      <Modal size="lg" opened={openedTM} onClose={closeTM} title="Task Manager">
-        Task Manager
+      <Modal size="lg" opened={openedEP} onClose={closeEP} title="Edit Project">
+        <ProjectForm projectId={editProject} onAddProject={handleAddProject} editProject={true} />
       </Modal>
 
-      <Modal size="lg"  opened={openedEP} onClose={closeEP} title="Edit Project">
-        <ProjectForm projectId = {editProject} onAddProject={handleAddProject} editProject={true} />
+      <Modal size="xl" opened={openedTM} onClose={closeTM} title="Task Manager">
+        <TaskManager projectId={editProject} />
       </Modal>
 
       <div>
