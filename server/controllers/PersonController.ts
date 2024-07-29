@@ -6,8 +6,14 @@ import {
   deleteSkillToPerson,
   deletePerson,
   getInfoPerson,
+  updatePerson,
 } from "../models/methods/PersonMethods";
-import { addAvailability, getAvaliability, getSingleAvaliability } from "../models/methods/PersonAvaliabilityMethods";
+import {
+  addAvailability,
+  getAvaliability,
+  getSingleAvaliability,
+} from "../models/methods/PersonAvaliabilityMethods";
+import { addSkill } from "../models/methods/SkillMethods";
 
 export const insertPerson = async (req: Request, res: Response) => {
   try {
@@ -43,14 +49,13 @@ export const insertPerson = async (req: Request, res: Response) => {
 
 export const removePerson = async (req: Request, res: Response) => {
   try {
-    const personId = req.params.personId
+    const personId = req.params.personId;
     await deletePerson(parseInt(personId));
     res.status(201).send(`${personId} removed!`);
   } catch (error) {
     res.status(400).send(error);
   }
 };
-
 
 export const allPeople = async (req: Request, res: Response) => {
   try {
@@ -63,13 +68,13 @@ export const allPeople = async (req: Request, res: Response) => {
 
 export const findPerson = async (req: Request, res: Response) => {
   try {
-    const personId = req.params.personId
-    const person = await getSingleAvaliability(parseInt(personId))
-    res.status(200).send(person)
+    const personId = req.params.personId;
+    const person = await getSingleAvaliability(parseInt(personId));
+    res.status(200).send(person);
   } catch (error) {
-    res.status(400).send(error)
+    res.status(400).send(error);
   }
-}
+};
 
 export const insertSkillToPerson = async (req: Request, res: Response) => {
   try {
@@ -92,8 +97,6 @@ export const removeSkillToPerson = async (req: Request, res: Response) => {
     res.status(400).send(error);
   }
 };
-
-
 
 export const insertAvailability = (req: Request, res: Response) => {
   try {
@@ -130,18 +133,80 @@ export const insertAvailability = (req: Request, res: Response) => {
       sunday_start,
       sunday_end
     );
-    res.status(201).send('Avaliability added!')
+    res.status(201).send("Avaliability added!");
   } catch (error) {
     res.status(400).send(error);
   }
 };
 
-
-export const allAvailability = async(req: Request , res: Response) => {
+export const allAvailability = async (req: Request, res: Response) => {
   try {
     const avaliability = await getAvaliability();
     res.status(200).send(avaliability);
   } catch (error) {
     res.status(400).send(error);
   }
-}
+};
+
+export const updateInfoPerson = async (req: Request, res: Response) => {
+  try {
+
+    console.log(req.body)
+    const personId = req.body.personId;
+    const personName = req.body.personName;
+    const skills = req.body.skills;
+    const availability = req.body.availability;
+
+    const personToEdit = await getInfoPerson(personId);
+
+    updatePerson(personId, personName);
+    const skillsDb = personToEdit?.skills.map((skill) => skill.name);
+
+    const skillsToRemove: string[] = [];
+    const skillsToAdd: string[] = [];
+
+    if (skillsDb) {
+      skills.forEach((skill: string) => {
+        if (!skillsDb.includes(skill)) skillsToAdd.push(skill);
+      });
+
+      skillsDb.forEach((skill: string) => {
+        if (!skills.includes(skill)) skillsToRemove.push(skill);
+      });
+    }
+
+    if(skillsToRemove.length > 0) {
+    skillsToRemove.forEach((skill) => {
+      deleteSkillToPerson(personName, skill);
+    });
+    }
+
+
+    if(skills)
+    skillsToAdd.forEach((skill) => {
+      addSkillToPerson(personName, skill);
+    });
+
+    addAvailability(
+      personName,
+      availability.monday_start,
+      availability.monday_end,
+      availability.tuesday_start,
+      availability.tuesday_end,
+      availability.wednesday_start,
+      availability.wednesday_end,
+      availability.thursday_start,
+      availability.thursday_start,
+      availability.friday_start,
+      availability.friday_end,
+      availability.saturday_start,
+      availability.saturday_end,
+      availability.sunday_start,
+      availability.sunday_end
+    );
+
+    res.status(201).send(`${personName} updated!`);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};

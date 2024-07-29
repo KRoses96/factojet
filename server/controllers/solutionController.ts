@@ -48,6 +48,9 @@ export const solutionFinder = async (req: Request, res: Response) => {
     .getRepository(Task)
     .find({ relations: { required: true, skills: true, project: true } });
 
+
+  if (!people.length || !peopleAvaliabilities.length || !projects.length || !tasks.length ) res.status(400).send('No Data')
+  else {
   //Check all Skills within the factory
   const getTeamSkills = (): string[] => {
     const skills: string[] = [];
@@ -231,6 +234,7 @@ export const solutionFinder = async (req: Request, res: Response) => {
   }
 
   res.status(200).json(schedule);
+}
 };
 
 //Prio Sort

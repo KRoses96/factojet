@@ -34,6 +34,14 @@ export const getInfoPerson = async(personId: number) => {
   return person
 }
 
+export const updatePerson = async(personId:number , personName: string) => {
+  await AppDataSource.createQueryBuilder()
+    .update(Person)
+    .set({ name: personName })
+    .where("id = :id", { id: personId })
+    .execute();
+}
+
 export const addSkillToPerson = async (
   personName: string,
   skillName: string
@@ -73,7 +81,7 @@ export const deleteSkillToPerson = async (
   const person = await AppDataSource.manager.findOneBy(Person, {
     name: personName,
   });
-
+  
   if (person && skillToRemove) {
     await AppDataSource.createQueryBuilder()
       .relation(Person, "skills")

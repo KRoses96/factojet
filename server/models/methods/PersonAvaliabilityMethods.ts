@@ -19,7 +19,7 @@ export const addAvailability = async (
   sunday_start: number | null,
   sunday_end: number | null
 ) => {
-  console.log("hello");
+  console.log(monday_start);
   const personId = await AppDataSource.manager
     .findOneBy(Person, {
       name: personName,

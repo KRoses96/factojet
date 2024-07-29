@@ -95,10 +95,12 @@ export const PeopleForm = ({ onAddPerson, selectedPerson }: PeopleFormProps) => 
 
   const handleSubmit = (values: FormPerson) => {
     setSubmittedValues(values);
-    const url = 'http://localhost:3000/';
-    fetch(url + 'people', {
-      method: 'POST',
+    const url = 'http://localhost:3000/people';
+    const methodRequest = selectedPerson? 'PUT' : 'POST'
+    fetch(url, {
+      method: methodRequest,
       body: JSON.stringify({
+        personId: selectedPerson,
         personName: values.name,
         availability: {
           monday_start: typeSchedules[values.monday as keyof typeof typeSchedules][0],
