@@ -4,15 +4,15 @@ The app's goal is to easily organize work within a factory in a easy and automat
 
 ### Preview
 
-![](readImgs\schedule.png)
+![](readImgs/schedule.png)
 
-![](readImgs\solu.png)
+![](readImgs/solu.png)
 
-![](readImgs\proj.png)
+![](readImgs/proj.png)
 
-![](readImgs\tasks.png)
+![](readImgs/tasks.png)
 
-![](readImgs\editTask.png)
+![](readImgs/editTask.png)
 
-![](readImgs\workers.png)
-![](readImgs\workAdd.png)
+![](readImgs/workers.png)
+![](readImgs/workAdd.png)
