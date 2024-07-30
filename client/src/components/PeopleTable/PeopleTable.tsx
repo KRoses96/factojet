@@ -5,7 +5,6 @@ import { useDisclosure } from '@mantine/hooks';
 import { PeopleForm } from '../PeopleForm/PeopleForm';
 import { generateColorRGB } from '@marko19907/string-to-color';
 
-
 const colorOptions = { saturation: 50, lightness: 55, alpha: 80 };
 
 export type Person = {
@@ -34,7 +33,7 @@ export type RespAvaliability = {
 };
 
 type Skill = {
-  id:number;
+  id: number;
   name: string;
 };
 
@@ -64,7 +63,7 @@ export const PeopleTable = () => {
 
   const handleAddPerson = () => {
     getAllPeole();
-    handleCloseModal()
+    handleCloseModal();
   };
 
   const handleRowClick = (personId: number) => {
@@ -107,10 +106,10 @@ export const PeopleTable = () => {
   };
 
   useEffect(() => {
-    try{
-    setInterval(getAllPeole,30);
+    try {
+      setTimeout(getAllPeole, 50);
     } catch (err) {
-      console.log('failed to update')
+      console.log('failed to update');
     }
   }, []);
 
@@ -128,77 +127,90 @@ export const PeopleTable = () => {
     </Table.Tr>
   );
 
-  
-
-  const rows = people.map((person) => (
-    <Table.Tr onClick={() => handleRowClick(person.id)} key={person.id}>
-      <Table.Td>{person.name}</Table.Td>
-      <Table.Td>
-        {person.skills.map((skill) => (
-          <Fragment key={skill}>
-            <Badge className="skills" color={generateColorRGB(skill, colorOptions)}>
-              {skill}
-            </Badge>
-            <span>{' '}</span>
-          </Fragment>
-        ))}
-      </Table.Td>
-      <Table.Td>
-        {person.weekAvaliability.monday ? (
-          <IconCheck style={iconStyle} />
-        ) : (
-          <IconX style={iconStyle} />
-        )}{' '}
-      </Table.Td>
-      <Table.Td>
-        {person.weekAvaliability.tuesday ? (
-          <IconCheck style={iconStyle} />
-        ) : (
-          <IconX style={iconStyle} />
-        )}{' '}
-      </Table.Td>
-      <Table.Td>
-        {person.weekAvaliability.wednesday ? (
-          <IconCheck style={iconStyle} />
-        ) : (
-          <IconX style={iconStyle} />
-        )}{' '}
-      </Table.Td>
-      <Table.Td>
-        {person.weekAvaliability.thursday ? (
-          <IconCheck style={iconStyle} />
-        ) : (
-          <IconX style={iconStyle} />
-        )}{' '}
-      </Table.Td>
-      <Table.Td>
-        {person.weekAvaliability.friday ? (
-          <IconCheck style={iconStyle} />
-        ) : (
-          <IconX style={iconStyle} />
-        )}{' '}
-      </Table.Td>
-      <Table.Td>
-        {person.weekAvaliability.saturday ? (
-          <IconCheck style={iconStyle} />
-        ) : (
-          <IconX style={iconStyle} />
-        )}{' '}
-      </Table.Td>
-      <Table.Td>
-        {person.weekAvaliability.sunday ? (
-          <IconCheck style={iconStyle} />
-        ) : (
-          <IconX style={iconStyle} />
-        )}{' '}
-      </Table.Td>
-    </Table.Tr>
-  ));
+  const rows = people
+    .sort(function (a, b) {
+      if (a.name < b.name) {
+        return -1;
+      }
+      if (a.name > b.name) {
+        return 1;
+      }
+      return 0;
+    })
+    .map((person) => (
+      <Table.Tr onClick={() => handleRowClick(person.id)} key={person.id}>
+        <Table.Td>{person.name}</Table.Td>
+        <Table.Td>
+          {person.skills.map((skill) => (
+            <Fragment key={skill}>
+              <Badge className="skills" color={generateColorRGB(skill, colorOptions)}>
+                {skill}
+              </Badge>
+              <span> </span>
+            </Fragment>
+          ))}
+        </Table.Td>
+        <Table.Td>
+          {person.weekAvaliability.monday ? (
+            <IconCheck style={iconStyle} />
+          ) : (
+            <IconX style={iconStyle} />
+          )}{' '}
+        </Table.Td>
+        <Table.Td>
+          {person.weekAvaliability.tuesday ? (
+            <IconCheck style={iconStyle} />
+          ) : (
+            <IconX style={iconStyle} />
+          )}{' '}
+        </Table.Td>
+        <Table.Td>
+          {person.weekAvaliability.wednesday ? (
+            <IconCheck style={iconStyle} />
+          ) : (
+            <IconX style={iconStyle} />
+          )}{' '}
+        </Table.Td>
+        <Table.Td>
+          {person.weekAvaliability.thursday ? (
+            <IconCheck style={iconStyle} />
+          ) : (
+            <IconX style={iconStyle} />
+          )}{' '}
+        </Table.Td>
+        <Table.Td>
+          {person.weekAvaliability.friday ? (
+            <IconCheck style={iconStyle} />
+          ) : (
+            <IconX style={iconStyle} />
+          )}{' '}
+        </Table.Td>
+        <Table.Td>
+          {person.weekAvaliability.saturday ? (
+            <IconCheck style={iconStyle} />
+          ) : (
+            <IconX style={iconStyle} />
+          )}{' '}
+        </Table.Td>
+        <Table.Td>
+          {person.weekAvaliability.sunday ? (
+            <IconCheck style={iconStyle} />
+          ) : (
+            <IconX style={iconStyle} />
+          )}{' '}
+        </Table.Td>
+      </Table.Tr>
+    ));
 
   return (
     <>
-      <Modal size="lg"  opened={opened} onClose={handleCloseModal} title={selectedPerson? 'Edit Worker' : 'New Worker'}>
-        <PeopleForm selectedPerson = {selectedPerson} onAddPerson={handleAddPerson} />
+      <Modal
+        size="lg"
+        opened={opened}
+        onClose={handleCloseModal}
+        title={selectedPerson ? 'Edit Worker' : 'New Worker'}
+      >
+        <PeopleForm selectedPerson={selectedPerson} onAddPerson={handleAddPerson} />
       </Modal>
 
       <Button onClick={open} variant="outline" size="md" radius="lg">

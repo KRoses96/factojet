@@ -1,10 +1,10 @@
-import ScheduleGroup from '@/components/SchedulerGroup/SchedulerGroup';
 import { Tabs, rem, Divider, Space } from '@mantine/core';
 import { IconCalendarTime, IconHammer, IconMan, IconBackhoe } from '@tabler/icons-react';
 import logo from '../factojet.png'
 import { PeopleTable } from '@/components/PeopleTable/PeopleTable';
 import { ProjectCard } from '@/components/ProjectCards/ProjectCard';
 import { useEffect, useState } from 'react';
+import { ScheduleGroup } from '@/components/SchedulerGroup/SchedulerGroup';
 export const HomePage = () => {
   const iconStyle = { width: rem(30), height: rem(30) };
   const [currentTab, setCurrentTab]= useState('schedule')

@@ -47,7 +47,7 @@ type RespProject = {
 };
 
 
-const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
+export const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
   const [myEvents, setEvents] = useState<MbscCalendarEvent[]>([]);
   const [myResources, setResources] = useState<MbscResource[]>([]);
   const [activeResourceIds, setActiveResourceIds] = useState<Set<number>>(new Set());
@@ -289,5 +289,3 @@ const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
     </>
   );
 };
-
-export default ScheduleGroup;

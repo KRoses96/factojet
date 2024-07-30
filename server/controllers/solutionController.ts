@@ -172,7 +172,7 @@ export const solutionFinder = async (req: Request, res: Response) => {
       }
     };
 
-    let nextTime = startTime.getTime();
+    let nextTime = startTime.getTime() - 86400000;
     const completedTasks: Set<string> = new Set();
     const ongoingTasks: { [personName: string]: number } = {}; // Track end time of ongoing tasks for each person
 
@@ -193,7 +193,7 @@ export const solutionFinder = async (req: Request, res: Response) => {
 
           if (
             prerequisitesCompleted &&
-            new Date(task.startDate).getTime() <= nextTime
+            new Date(task.startDate).getTime() - 86400000 <= nextTime
           ) {
             let person: AvaliablePeople | undefined;
             let canDo = false;
@@ -242,7 +242,6 @@ export const solutionFinder = async (req: Request, res: Response) => {
           }
         });
       }
-
       nextTime += 3600000; // Move to the next hour
     }
 
