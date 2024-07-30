@@ -4,15 +4,15 @@ The app's goal is to easily organize work within a factory in a easy and automat
 
 ### Preview
 
-![](C:\Users\HelpDesk-Lenitec\Desktop\factojet\readImgs\schedule.png)
+![](readImgs\schedule.png)
 
-![](C:\Users\HelpDesk-Lenitec\Desktop\factojet\readImgs\solu.png)
+![](readImgs\solu.png)
 
-![](C:\Users\HelpDesk-Lenitec\Desktop\factojet\readImgs\proj.png)
+![](readImgs\proj.png)
 
-![](C:\Users\HelpDesk-Lenitec\Desktop\factojet\readImgs\tasks.png)
+![](readImgs\tasks.png)
 
-![](C:\Users\HelpDesk-Lenitec\Desktop\factojet\readImgs\editTask.png)
+![](readImgs\editTask.png)
 
-![](C:\Users\HelpDesk-Lenitec\Desktop\factojet\readImgs\workers.png)
-![](C:\Users\HelpDesk-Lenitec\Desktop\factojet\readImgs\workAdd.png)
+![](readImgs\workers.png)
+![](readImgs\workAdd.png)
