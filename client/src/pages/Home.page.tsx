@@ -14,6 +14,7 @@ export const HomePage = () => {
   }
 
   useEffect(() => {
+    document.title = 'Factojet'
   }, [currentTab])
 
   return (

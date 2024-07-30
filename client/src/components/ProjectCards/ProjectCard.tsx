@@ -1,4 +1,4 @@
-import { Card, Flex, ColorSwatch, Table, Space, Text, Divider, Button, Modal } from '@mantine/core';
+import { Card, Flex, ColorSwatch, Table, Space, Text, Divider, Button, Modal, Image } from '@mantine/core';
 import { useState, useEffect, Fragment } from 'react';
 import { DonutChart } from '@mantine/charts';
 import { generateColorRGB } from '@marko19907/string-to-color';
@@ -22,6 +22,7 @@ export type RespProject = {
     complete: boolean;
     skills: { id: string; name: string }[];
   }[];
+  imgUrl: string;
 };
 
 type Skill = {
@@ -43,6 +44,7 @@ type Project = {
   start: Date;
   prio: string;
   skills: Skill[];
+  image: string;
 };
 
 type AggregatedSkillTimes = {
@@ -122,6 +124,7 @@ export const ProjectCard = () => {
               skills: skills,
               prio: prioText[project.priority as keyof typeof prioText],
               start: project.start_date,
+              image: project.imgUrl
             };
           })
         )
@@ -132,17 +135,28 @@ export const ProjectCard = () => {
     getAllProjects();
   }, []);
 
-  const cards = projects.map((project, i) => (
+  const cards = projects.sort(function (a, b) {
+    if (a.name < b.name) {
+      return -1;
+    }
+    if (a.name > b.name) {
+      return 1;
+    }
+    return 0;
+  }).map((project, i) => (
     <Fragment key={i}>
       <Flex mih={50} gap="md" justify="left" align="center" direction="row" wrap="nowrap">
         <div className="card">
           <Card shadow="sm" padding="xl" component="a" target="_blank">
             <Card.Section>
-              <Text fw={500} size="xl" ta="center">
-                {project.name}
-              </Text>
+              <Image
+                src= {project.image}
+                height={160}
+              />
             </Card.Section>
-
+            <Text fw={500} size="xl" ta="center">
+              {project.name}
+            </Text>
             <Text td="underline" fw={400} size="lg" mt="md">
               Priority: {project.prio}
             </Text>
@@ -269,7 +283,7 @@ export const ProjectCard = () => {
       </Modal>
 
       <Modal size="100%" opened={openedTM} onClose={closeTM} title="Task Manager">
-        <TaskManager projectId={editProject} onAddProject = {handleAddProject} />
+        <TaskManager projectId={editProject} onAddProject={handleAddProject} />
       </Modal>
 
       <div>

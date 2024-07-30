@@ -16,6 +16,7 @@ import { isNotEmpty, useForm } from '@mantine/form';
 import { Task, Skill } from '../TaskManager/TaskManager';
 import { Person } from '../PeopleTable/PeopleTable';
 import { RespProject } from '../ProjectCards/ProjectCard';
+import './TaskForm.css'
 
 type FormTask = {
   name: string;
@@ -199,9 +200,9 @@ export const TaskForm = ({ onAddTask, selectedTask, projectId }: TaskFormProps) 
       ) : (
         <>
           <Flex mih={50} gap="md" justify="center" align="center" direction="row" wrap="wrap">
-            <TextInput {...form.getInputProps('name')} label="Name" placeholder="Name" />
+            <TextInput className='task-name-input' {...form.getInputProps('name')} label="Task Name" placeholder="Name" />
             <Space h="md" />
-            <TextInput
+            <TextInput className='time-input'
               {...form.getInputProps('time')}
               type="number"
               label="Time(Hours)"
@@ -276,11 +277,11 @@ export const TaskForm = ({ onAddTask, selectedTask, projectId }: TaskFormProps) 
               {selectedTask ? 'Save' : 'Add'}
             </Button>
 
-            {selectedTask && (
+            {selectedTask ? (
               <Button onClick={handleDelete} type="button" color="red" mt="md">
                 Delete
               </Button>
-            )}
+            ) : (<></>)}
           </Flex>
         </>
       )}

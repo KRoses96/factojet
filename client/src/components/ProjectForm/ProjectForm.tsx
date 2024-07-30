@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Button, Code, Text, TextInput, Space, Textarea, Slider, Flex } from '@mantine/core';
+import { useState, useEffect, useRef } from 'react';
+import { Button, Code, Text, TextInput, Space, Textarea, Slider, Flex, Image, Center } from '@mantine/core';
 import { hasLength, isNotEmpty, useForm } from '@mantine/form';
 import { Calendar, DatePicker } from '@mantine/dates';
 import '@mantine/dates/styles.css';
@@ -10,6 +10,7 @@ type FormProject = {
   details: string;
   start: Date;
   priority: number;
+  image: string;
 };
 
 type ProjectFormProps = {
@@ -24,21 +25,23 @@ type ResponseProject = {
   start_date: Date;
   details: string;
   priority: number;
+  image: string;
 };
 
 export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFormProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [submittedValues, setSubmittedValues] = useState<FormProject | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const url = 'http://localhost:3000/project'; //Endpoint for all project related changes
-
-
 
   const [projectData, setProjectData] = useState<FormProject>({
     name: '',
     details: '',
     start: new Date(),
     priority: 50,
+    image: '',
   });
 
   const getProject = () => {
@@ -53,8 +56,10 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
           details: project.details,
           start: new Date(project.start_date),
           priority: project.priority,
+          image: project.image
         });
         setSelectedDate(new Date(project.start_date));
+        setImagePreview(project.image);
         console.log(projectData)
       });
   };
@@ -62,7 +67,8 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
   useEffect(() => {
     if (editProject && projectId) {
       getProject();
-  }}, [editProject, projectId]);
+    }
+  }, [editProject, projectId]);
 
   const form = useForm<FormProject>({
     initialValues: projectData,
@@ -98,7 +104,35 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
     }).then(() => onAddProject())
   }
 
-  const handleSubmit = (values: FormProject) => {
+  const uploadToCloudinary = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'kwowldyl');
+    try {
+      const response = await fetch('https://api.cloudinary.com/v1_1/dksp40fgp/image/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error('Error uploading to Cloudinary:', error);
+      return null;
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = await uploadToCloudinary(file);
+      if (imageUrl) {
+        form.setFieldValue('image', imageUrl);
+        setImagePreview(imageUrl);
+      }
+    }
+  };
+
+  const handleSubmit = async (values: FormProject) => {
     const projectData = {
       ...values,
       start: selectedDate,
@@ -113,11 +147,11 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
         projectStart: projectData.start,
         projectPriority: projectData.priority,
         projectDetail: projectData.details,
+        projectImage: projectData.image
       }),
       headers: { 'Content-Type': 'application/json' },
     }).then(() => onAddProject());
   };
-
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -150,23 +184,39 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
         />
       </Flex>
       <Space h='md'/>
+      <Center>
+      <Button onClick={() => fileInputRef.current?.click()}>
+        Upload Image
+      </Button>
+      </Center>
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        onChange={handleImageUpload}
+        accept="image/*"
+      />
+      {imagePreview && (
+        <>
+        <Text>
+          Preview:
+        </Text>
+        <Image src={imagePreview} alt="Project Image" width={200} />
+        </>
+      )}
+      <Space h='md'/>
       <Flex mih={50} gap="md" justify="center" align="center" direction="row" wrap="wrap">
         <Button type="submit" mt="md">
           {editProject? (<>Save</>) : (<>Create New Project</>)}
         </Button>
         {editProject ? (
           <>
-            <Button type='submit' onClick={handleDelete} color="red" mt="md">
+            <Button type='button' onClick={handleDelete} color="red" mt="md">
               Delete
             </Button>
           </>
         ) : null}
       </Flex>
-      {submittedValues && (
-        <Text mt="md">
-          Submitted values: <Code block>{JSON.stringify(submittedValues, null, 2)}</Code>
-        </Text>
-      )}
     </form>
   );
 };

@@ -13,7 +13,8 @@ export const insertProject = async (req: Request, res: Response) => {
     const projectStart = req.body.projectStart;
     const projectPriority = req.body.projectPriority
     const projectDetail = req.body.projectDetail
-    await addProject(projectName, projectStart, projectPriority,projectDetail);
+    const projectImage = req.body.projectImage
+    await addProject(projectName, projectStart, projectPriority,projectDetail,projectImage);
     res.status(201).send(`${projectName} added!`);
   } catch (error) {
     res.status(400).send(error);
@@ -46,7 +47,8 @@ export const updateProject = async (req: Request, res: Response) => {
     const projectDetail = req.body.projectDetail;
     const projectPriority = req.body.projectPriority
     const projectStart = new Date(req.body.projectStart)
-    editProject(projectId,projectName,projectStart,projectPriority,projectDetail)
+    const projectImage = req.body.projectImage
+    editProject(projectId,projectName,projectStart,projectPriority,projectDetail,projectImage)
     res.status(202).send(`${projectName} updated!`);
   } catch (error) {
     res.status(400).send(error);

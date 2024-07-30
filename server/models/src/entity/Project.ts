@@ -19,6 +19,9 @@ export class Project {
   @Column()
   priority: number
 
+  @Column()
+  imgUrl: string;
+
   @OneToMany(() => Task, (task) => task.project, {cascade:true, onDelete: 'CASCADE'})
   tasks: Task[];
 }

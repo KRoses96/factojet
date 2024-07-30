@@ -6,7 +6,8 @@ export const addProject = async (
   projectName: string,
   startDate: Date,
   priority: number,
-  details: string
+  details: string,
+  projectImage : string
 ) => {
   await AppDataSource.createQueryBuilder()
     .insert()
@@ -16,6 +17,7 @@ export const addProject = async (
       start_date: startDate,
       priority: priority,
       details: details,
+      imgUrl: projectImage
     })
     .execute();
 };
@@ -44,18 +46,22 @@ export const editProject = async (
   projectName: string,
   start: Date,
   priority: number,
-  projectDetail: string
+  projectDetail: string,
+  projectImage: string,
 ) => {
+  const changes : any = {
+    details: projectDetail,
+    name: projectName,
+    start_date: start,
+    priority: priority,
+  }
+  if (projectImage) changes.imgUrl = projectImage
   await AppDataSource.createQueryBuilder()
     .update(Project)
-    .set({
-      details: projectDetail,
-      name: projectName,
-      start_date: start,
-      priority: priority,
-    })
+    .set(changes)
     .where("id = :id", { id: projectId })
     .execute();
+  
 };
 
 export const getInfoProject = async (projectId: number) => {
