@@ -22,6 +22,26 @@ The app's goal is to easily organize work within a factory in a easy and automat
 
 ---
 
+### Stack:
+
+- Typescript
+
+- Express
+
+- TypeORM
+
+- Postgres
+
+- React
+
+- Mantine
+
+- Mobiscroll
+
+- Cloudinary
+
+---
+
 ## Preview
 
 ![](readImgs/schedule.png)
