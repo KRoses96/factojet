@@ -150,7 +150,7 @@ export const ProjectCard = () => {
           <Card shadow="sm" padding="xl" component="a" target="_blank">
             <Card.Section>
               <Image
-                src= {project.image}
+                src={project.image}
                 height={160}
               />
             </Card.Section>

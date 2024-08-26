@@ -43,7 +43,7 @@ export const TaskManager = ({ projectId , onAddProject }: { projectId: number, o
   };
 
   const getAllTasks = () => {
-    const url = 'http://localhost:3000/project/' + projectId;
+    const url = `http://localhost:3000/project/${projectId}`;
     fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export const TaskManager = ({ projectId , onAddProject }: { projectId: number, o
 
   useEffect(() => {
     try {
-      setInterval(getAllTasks,40);
+      setInterval(getAllTasks,10000);
     } catch (err) {
       console.log('failed to update')
     }

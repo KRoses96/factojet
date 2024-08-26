@@ -13,7 +13,7 @@ export type Person = {
   skills: Skill[];
 };
 
-export type RespAvaliability = {
+export type RespAvailability = {
   id: number;
   person: Person;
   monday_start: number;
@@ -37,7 +37,7 @@ type Skill = {
   name: string;
 };
 
-type WeekAvaliability = {
+type WeekAvailability = {
   monday: boolean;
   tuesday: boolean;
   wednesday: boolean;
@@ -51,7 +51,7 @@ type People = {
   id: number;
   name: string;
   skills: string[];
-  weekAvaliability: WeekAvaliability;
+  weekAvailability: WeekAvailability;
 };
 
 export const PeopleTable = () => {
@@ -62,7 +62,7 @@ export const PeopleTable = () => {
   const [selectedPerson, setSelectedPerson] = useState<number | null>(null);
 
   const handleAddPerson = () => {
-    getAllPeole();
+    getAllPeople();
     handleCloseModal();
   };
 
@@ -76,7 +76,7 @@ export const PeopleTable = () => {
     setSelectedPerson(null);
   };
 
-  const getAllPeole = () => {
+  const getAllPeople = () => {
     const url = 'http://localhost:3000/avaliability';
     fetch(url, {
       headers: {
@@ -86,18 +86,18 @@ export const PeopleTable = () => {
       .then((resp) => resp.json())
       .then((data) =>
         setPeople(
-          data.map((person: RespAvaliability) => ({
+          data.map((person: RespAvailability) => ({
             id: person.person.id,
             name: person.person.name,
             skills: person.person.skills.map((skill) => skill.name),
-            weekAvaliability: {
-              monday: person.monday_start && person.monday_end ? true : false,
-              tuesday: person.tuesday_start && person.tuesday_end ? true : false,
-              wednesday: person.wednesday_start && person.wednesday_end ? true : false,
-              thursday: person.thursday_start && person.thursday_end ? true : false,
-              friday: person.friday_start && person.friday_end ? true : false,
-              saturday: person.saturday_start && person.saturday_end ? true : false,
-              sunday: person.sunday_start && person.sunday_end ? true : false,
+            weekAvailability: {
+              monday: person.monday_start && person.monday_end ,
+              tuesday: person.tuesday_start && person.tuesday_end,
+              wednesday: person.wednesday_start && person.wednesday_end ,
+              thursday: person.thursday_start && person.thursday_end ,
+              friday: person.friday_start && person.friday_end ,
+              saturday: person.saturday_start && person.saturday_end ,
+              sunday: person.sunday_start && person.sunday_end,
             },
           }))
         )
@@ -105,12 +105,10 @@ export const PeopleTable = () => {
       .catch((error) => console.error('Error fetching data:', error));
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    try {
-      setTimeout(getAllPeole, 50);
-    } catch (err) {
-      console.log('failed to update');
-    }
+      //Pooling in case multiple people are managing
+      setTimeout(getAllPeople, 5000);
   }, []);
 
   const ths = (
@@ -128,7 +126,7 @@ export const PeopleTable = () => {
   );
 
   const rows = people
-    .sort(function (a, b) {
+    .sort((a, b) => {
       if (a.name < b.name) {
         return -1;
       }
@@ -151,49 +149,49 @@ export const PeopleTable = () => {
           ))}
         </Table.Td>
         <Table.Td>
-          {person.weekAvaliability.monday ? (
+          {person.weekAvailability.monday ? (
             <IconCheck style={iconStyle} />
           ) : (
             <IconX style={iconStyle} />
           )}{' '}
         </Table.Td>
         <Table.Td>
-          {person.weekAvaliability.tuesday ? (
+          {person.weekAvailability.tuesday ? (
             <IconCheck style={iconStyle} />
           ) : (
             <IconX style={iconStyle} />
           )}{' '}
         </Table.Td>
         <Table.Td>
-          {person.weekAvaliability.wednesday ? (
+          {person.weekAvailability.wednesday ? (
             <IconCheck style={iconStyle} />
           ) : (
             <IconX style={iconStyle} />
           )}{' '}
         </Table.Td>
         <Table.Td>
-          {person.weekAvaliability.thursday ? (
+          {person.weekAvailability.thursday ? (
             <IconCheck style={iconStyle} />
           ) : (
             <IconX style={iconStyle} />
           )}{' '}
         </Table.Td>
         <Table.Td>
-          {person.weekAvaliability.friday ? (
+          {person.weekAvailability.friday ? (
             <IconCheck style={iconStyle} />
           ) : (
             <IconX style={iconStyle} />
           )}{' '}
         </Table.Td>
         <Table.Td>
-          {person.weekAvaliability.saturday ? (
+          {person.weekAvailability.saturday ? (
             <IconCheck style={iconStyle} />
           ) : (
             <IconX style={iconStyle} />
           )}{' '}
         </Table.Td>
         <Table.Td>
-          {person.weekAvaliability.sunday ? (
+          {person.weekAvailability.sunday ? (
             <IconCheck style={iconStyle} />
           ) : (
             <IconX style={iconStyle} />

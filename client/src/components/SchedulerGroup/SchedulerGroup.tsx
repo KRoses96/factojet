@@ -3,14 +3,17 @@ import './SchedulerGroup.css';
 import {
   Eventcalendar,
   getJson,
-  MbscCalendarEvent,
-  MbscEventcalendarView,
-  MbscResource,
   setOptions,
   Page,
   Checkbox,
 } from '@mobiscroll/react';
-import { FC, useEffect, useMemo, useState, ChangeEvent, useCallback } from 'react';
+import type {
+  MbscCalendarEvent,
+  MbscEventcalendarView,
+  MbscResource,
+} from '@mobiscroll/react'
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import type { ChangeEvent } from 'react'
 import { generateColorRGB } from '@marko19907/string-to-color';
 import { Space, Divider, Title, Text, Flex, Table, ColorSwatch } from '@mantine/core';
 import { DonutChart } from '@mantine/charts';
@@ -47,7 +50,7 @@ type RespProject = {
 };
 
 
-export const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
+export const ScheduleGroup = ({ currentTab }: { currentTab: string }) => {
   const [myEvents, setEvents] = useState<MbscCalendarEvent[]>([]);
   const [myResources, setResources] = useState<MbscResource[]>([]);
   const [activeResourceIds, setActiveResourceIds] = useState<Set<number>>(new Set());
@@ -73,7 +76,7 @@ export const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
 
   const processWorkedTimeData = useCallback(() => {
     const workedTime: { [key: string]: number } = {};
-    myEvents.forEach((event: MbscCalendarEvent) => {
+    myEvents.map((event: MbscCalendarEvent) => {
       if (
         event.resource &&
         event.start &&
@@ -95,15 +98,15 @@ export const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
 
     const newWorkedTimeData = Object.entries(workedTime).map(([name, value]) => ({
       name,
-      value: parseFloat(value.toFixed(2)), // Round to 2 decimal places
+      value: Number.parseFloat(value.toFixed(2)), // Round to 2 decimal places
       color: generateColorRGB(name, colorOptions),
     }));
 
-    setWorkedTimeData(newWorkedTimeData.sort((a,b) => b.value-a.value));
+    setWorkedTimeData(newWorkedTimeData.sort((a, b) => b.value - a.value));
   }, [myEvents, myResources]);
 
   const filter = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
-    const resourceId = parseInt(ev.target.value, 10);
+    const resourceId = Number.parseInt(ev.target.value, 10);
     setActiveResourceIds((prev) => {
       const newSet = new Set(prev);
       if (ev.target.checked) {
@@ -119,6 +122,7 @@ export const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
     return myResources.filter((r) => activeResourceIds.has(typeof r.id === 'number' ? r.id : 0));
   }, [myResources, activeResourceIds]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     const url = 'http://localhost:3000/project';
     processWorkedTimeData();
@@ -131,11 +135,12 @@ export const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
       .then((data) => setProjects(data));
   }, [myEvents, myResources, processWorkedTimeData]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     getJson(
       'http://localhost:3000/people',
       (resources) => {
-        let resourceArr: MbscResource[] = resources
+        const resourceArr: MbscResource[] = resources
           .map((resource: { name: string; id: number }) => ({
             id: resource.id,
             name: resource.name,
@@ -160,7 +165,7 @@ export const ScheduleGroup= ({currentTab}: {currentTab: string}) => {
       },
       'json'
     );
-  }, [currentTab ]);
+  }, [currentTab]);
 
   return (
     <>

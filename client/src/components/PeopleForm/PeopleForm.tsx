@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button, Text, TextInput, TagsInput, Space, Radio, Group } from '@mantine/core';
 import { hasLength, isNotEmpty, useForm } from '@mantine/form';
-import { RespAvaliability } from '../PeopleTable/PeopleTable';
+import type { RespAvailability } from '../PeopleTable/PeopleTable';
 
 type FormPerson = {
   name: string;
@@ -21,7 +21,7 @@ type PeopleFormProps = {
 };
 
 export const PeopleForm = ({ onAddPerson, selectedPerson }: PeopleFormProps) => {
-  const [submittedValues, setSubmittedValues] = useState<FormPerson | null>(null);
+  const [_, setSubmittedValues] = useState<FormPerson | null>(null);
   const [personData, setPersonData] = useState<FormPerson>({
     name: '',
     tags: [],
@@ -51,14 +51,15 @@ export const PeopleForm = ({ onAddPerson, selectedPerson }: PeopleFormProps) => 
     dayOff: [0, 0],
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (selectedPerson) {
       setIsLoading(true);
-      fetch(url + `/${selectedPerson}`, {
+      fetch(`${url}/${selectedPerson}`, {
         headers: { 'Content-Type': 'application/json' },
       })
         .then((response) => response.json())
-        .then((person: RespAvaliability) => {
+        .then((person: RespAvailability) => {
           const mapShift = (start: number, end: number) => {
             if (start === 8 && end === 18) return 'fullTime';
             if (start === 8 && end === 13) return 'morningShift';

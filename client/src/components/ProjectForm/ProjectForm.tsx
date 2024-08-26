@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Button, Code, Text, TextInput, Space, Textarea, Slider, Flex, Image, Center } from '@mantine/core';
-import { hasLength, isNotEmpty, useForm } from '@mantine/form';
-import { Calendar, DatePicker } from '@mantine/dates';
+import { Button, Text, TextInput, Space, Textarea, Slider, Flex, Image, Center } from '@mantine/core';
+import { isNotEmpty, useForm } from '@mantine/form';
+import { DatePicker } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import './ProjectForm.css';
 
@@ -30,7 +30,7 @@ type ResponseProject = {
 
 export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFormProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [submittedValues, setSubmittedValues] = useState<FormProject | null>(null);
+  const [_, setSubmittedValues] = useState<FormProject | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -45,12 +45,11 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
   });
 
   const getProject = () => {
-    return fetch(url + `/${projectId}`, {
+    return fetch(`${url}/${projectId}`, {
       headers: { 'Content-Type': 'application/json' },
     })
       .then((response) => response.json())
       .then((project: ResponseProject) => {
-        console.log(project)
         setProjectData({
           name: project.name,
           details: project.details,
@@ -60,10 +59,10 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
         });
         setSelectedDate(new Date(project.start_date));
         setImagePreview(project.image);
-        console.log(projectData)
       });
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (editProject && projectId) {
       getProject();
@@ -79,6 +78,7 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
     },
   });
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (projectData.name !== undefined && projectData.details !== undefined && 
         projectData.start !== undefined && projectData.priority !== undefined) {
@@ -99,7 +99,7 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
   ];
 
   const handleDelete = () => {
-    fetch( url + `/${projectId}`, {
+    fetch( `${url}/${projectId}`, {
       method: 'DELETE',
     }).then(() => onAddProject())
   }
@@ -116,7 +116,6 @@ export const ProjectForm = ({ onAddProject, editProject, projectId }: ProjectFor
       const data = await response.json();
       return data.secure_url;
     } catch (error) {
-      console.error('Error uploading to Cloudinary:', error);
       return null;
     }
   };
