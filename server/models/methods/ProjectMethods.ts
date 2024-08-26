@@ -2,6 +2,15 @@ import { AppDataSource } from "../src/data-source";
 import { Project } from "../src/entity/Project";
 import { Task } from "../src/entity/Task";
 
+
+type ChangeProject = {
+  details: string,
+    name: string,
+    start_date: Date,
+    priority: number,
+    imgUrl: string,
+}
+
 export const addProject = async (
   projectName: string,
   startDate: Date,
@@ -49,13 +58,13 @@ export const editProject = async (
   projectDetail: string,
   projectImage: string,
 ) => {
-  const changes : any = {
+  const changes : ChangeProject = {
     details: projectDetail,
     name: projectName,
     start_date: start,
     priority: priority,
+    imgUrl: projectImage
   }
-  if (projectImage) changes.imgUrl = projectImage
   await AppDataSource.createQueryBuilder()
     .update(Project)
     .set(changes)

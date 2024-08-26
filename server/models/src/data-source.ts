@@ -5,7 +5,7 @@ import { Skill } from "./entity/Skill";
 import { Person } from "./entity/Person";
 import { Project } from "./entity/Project";
 import { Task } from "./entity/Task";
-import { PersonAvaliability } from "./entity/PersonAvailability";
+import { PersonAvailability } from "./entity/PersonAvailability";
 import { Tool } from "./entity/Tool";
 
 export const AppDataSource = new DataSource({
@@ -17,7 +17,7 @@ export const AppDataSource = new DataSource({
   database: "factorito",
   synchronize: true,
   logging: false,
-  entities: [Person, Project, Skill, Task, User, PersonAvaliability, Tool],
+  entities: [Person, Project, Skill, Task, User, PersonAvailability, Tool],
   migrations: [],
   subscribers: [],
 });
